@@ -1,56 +1,69 @@
 "use client";
 
+import authService from "@/services/AuthService";
+import { AuthFormData, AuthFormSchema } from "@/validation/AuthFormSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper, TextField, Typography, Link as MuiLink } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { error } from "console";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export default function SignupPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // TODO: wire up to backend auth API
-    console.log("Signup with", { name, email, password, confirmPassword });
+  const router = useRouter();
+
+  const { register, handleSubmit, formState: { errors } } = useForm<AuthFormData>({
+    resolver: zodResolver(AuthFormSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
+  // tanstack wrapper
+  const mutation = useMutation({
+    mutationFn: async (data: AuthFormData) => {
+      const response = await authService.signUp(data);
+      return response.message;
+    },
+    onSuccess: (data: string | undefined) => {
+      toast.success(data);
+      router.push("/dashboard")
+
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || err.message || "Login failed");
+    }
+  });
+
+  const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
+    mutation.mutate(data);
   };
 
   return (
     <Container maxWidth="sm" sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
-        <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-          Sign Up
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
-          <TextField
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-            required
-          />
+        <h1 className="section-title">Sign Up</h1>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="Email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             fullWidth
             required
           />
           <TextField
             label="Password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            required
-          />
-          <TextField
-            label="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            {...register('password')}
+            error={!!errors.password}
+            helperText={errors.password?.message}
             fullWidth
             required
           />
