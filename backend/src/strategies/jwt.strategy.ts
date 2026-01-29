@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
+import { User } from "src/users/users.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,9 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        const user = await this.prisma.user.findUnique({ where: { id: payload.userId }, select: { id: true } });
-        if (!user)
+        const userId = await this.userRepository.findOne({ where: { id: payload.userId } ,select: { id: true }});
+        if (!userId)
             throw new NotFoundException();
-        return user;
+        return userId;
     }
 }
