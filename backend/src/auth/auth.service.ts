@@ -3,7 +3,7 @@ import { GeneralAuthDto } from './dto/general-auth.dto';
 import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/users/users.entity';
+import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 

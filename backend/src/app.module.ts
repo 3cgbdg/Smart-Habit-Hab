@@ -5,7 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-
+import { QuotesModule } from './quotes/quotes.module';
+import { HabitsModule } from './habits/habits.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
       database: 'smart_habit',
       autoLoadEntities: true,
       synchronize: true,
-      dropSchema: true,
+      logging: true,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -29,13 +30,16 @@ import { JwtModule } from '@nestjs/jwt';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '15m' }
-       }),
+      }),
     }),
     UsersModule,
+
     AuthModule,
     ProfilesModule,
+    QuotesModule,
+    HabitsModule
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

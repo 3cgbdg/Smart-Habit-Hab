@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { GeneralAuthDto } from './dto/general-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/users.entity';
+import { User } from 'src/users/user.entity';
 
 @Controller('auth')
 export class AuthController {
