@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: #ffffff;
+  --font-inter: var(--font-inter);
+  --font-oswald: var(--font-oswald);
+  --font-dancing_script: var(--font-dancing_script);
+  --color-gray: #565d6dff;
+  --color-violet: #9077f3ff;
+  --color-darkBlue: #3b13daff;
+  --color-blue: #3a7ae9ff;
+  --color-orange: #ea7b48ff;
+  --color-lightBlue: #f2f6fdff;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-neutral-900);
+  font-family: var(--font-inter);
+}
+
+._container {
+  @apply max-w-[1400px] px-[13px] mx-auto w-full;
+}
+
+._border {
+  @apply border-[1px]  border-neutral-300 shadow-xs;
+}
+
+.page-title {
+  @apply text-3xl leading-9 font-bold text-neutral-900;
+}
+
+.section-title {
+  @apply text-2xl leading-8 font-bold text-neutral-900;
+}
+.link {
+  @apply text-sm leading-5.5 font-medium text-blue  cursor-pointer transition-colors hover:text-darkBlue;
+}
+.banner_gradient {
+  background: linear-gradient(124.82deg, #f2f6fdff 0%, #fbe5daff 100%);
+}

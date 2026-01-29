@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { Provider as ReduxProvider } from "react-redux";
-import { store } from "../store/store";
+import { store } from "../redux/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
