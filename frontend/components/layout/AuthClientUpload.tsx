@@ -2,7 +2,7 @@
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import FullSreenLoader from "./FullSreenLoader";
+import FullSreenLoader from "../FullSreenLoader";
 import { fetchProfile } from "@/redux/profileSlice";
 
 // fetching data component every reload
