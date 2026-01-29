@@ -6,8 +6,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import authService from "@/services/AuthService";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 
 export default function Header() {
     const router = useRouter();
@@ -27,31 +25,23 @@ export default function Header() {
 
     const handleCloseMenu = () => setAnchorEl(null);
 
-
-    const mutation = useMutation({
-        mutationFn: async () => {
-            const data = await authService.logOut();
-            return data;
-        },
-        onSuccess: (data) => {
-            toast.success(data.message);
+    const handleLogout = async () => {
+        try {
+            await authService.logOut();
+        } finally {
             handleCloseMenu();
             router.push("/auth/login");
-        },
-
-        onError: (err) => {
-            toast.error(err.message);
+            router.refresh();
         }
-    })
-
+    };
 
     return (
         <AppBar position="static" sx={{ backgroundColor: "white", color: "text.primary", boxShadow: 1 }}>
             <Toolbar sx={{ justifyContent: "space-between", px: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
                     <Link className=" flex gap-2 items-center" href={"/dashboard"}>
-                        <Goal size={30} />
-                        <span>SHHab</span>
+                    <Goal size={30} />
+                    <span>SHHab</span>
                     </Link>
 
                     {/* Navigation items */}
@@ -107,7 +97,7 @@ export default function Header() {
                         Dashboard
                     </MenuItem>
                     <Divider />
-                    <MenuItem onClick={() => mutation.mutate()}>
+                    <MenuItem onClick={handleLogout}>
                         <ListItemIcon>
                             <User size={18} />
                         </ListItemIcon>

@@ -1,6 +1,8 @@
 "use client"
 
+import quoteService from "@/services/QuoteService";
 import { Button, Card, CardContent, Chip, Paper, Typography } from "@mui/material"
+import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -15,6 +17,15 @@ const Page = () => {
         { day: 'Sat', value: 3 },
         { day: 'Sun', value: 2 },
     ];
+
+    const { data: quote } = useQuery({
+        queryKey: ['random-quote'],
+        queryFn: async () => {
+            const data = await quoteService.getRandomQuote();
+            return data.data;
+        },
+
+    })
 
     return (
         <div className="flex flex-col gap-6">
@@ -56,102 +67,109 @@ const Page = () => {
                 </div>
             </div>
 
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Weekly Progress Section */}
-                    <Card className="shadow-sm">
-                        <CardContent>
-                            <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
-                                Weekly Progress
+            <div className="grid grid-cols-4 gap-6 items-start">
+
+
+
+
+                {/* Weekly Progress Section */}
+
+                <Card className="shadow-sm col-span-3">
+                    <CardContent>
+                        <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
+                            Weekly Progress
+                        </Typography>
+
+                        <div className="mb-6">
+                            <Typography variant="subtitle2" className="text-gray-600 mb-3">
+                                Habit Completion Trends
                             </Typography>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <LineChart data={habitData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis
+                                        dataKey="day"
+                                        tick={{ fontSize: 12 }}
+                                        stroke="#999"
+                                    />
+                                    <YAxis
+                                        tick={{ fontSize: 12 }}
+                                        stroke="#999"
+                                    />
+                                    <Tooltip />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke="#3b82f6"
+                                        strokeWidth={2}
+                                        dot={{ fill: '#3b82f6', r: 4 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
 
-                            <div className="mb-6">
-                                <Typography variant="subtitle2" className="text-gray-600 mb-3">
-                                    Habit Completion Trends
-                                </Typography>
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <LineChart data={habitData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis
-                                            dataKey="day"
-                                            tick={{ fontSize: 12 }}
-                                            stroke="#999"
-                                        />
-                                        <YAxis
-                                            tick={{ fontSize: 12 }}
-                                            stroke="#999"
-                                        />
-                                        <Tooltip />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="value"
-                                            stroke="#3b82f6"
-                                            strokeWidth={2}
-                                            dot={{ fill: '#3b82f6', r: 4 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </CardContent>
-                    </Card>
 
-                    {/* Two Column Layout */}
-                    <div className="grid  grid-cols-3 gap-6">
 
-                        <Card className="shadow-sm">
-                            <CardContent>
-                                <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
-                                    Daily Inspiration
-                                </Typography>
+                    </CardContent>
+                </Card>
 
-                                <div className="bg-blue-50 rounded-lg p-6">
-                                    <Typography
-                                        variant="body1"
-                                        className="text-gray-700 italic leading-relaxed"
-                                    >
-                                        "The journey of a thousand miles begins with a single step."
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        className="text-gray-500 mt-4 block text-right"
-                                    >
-                                        - Lao Tzu
-                                    </Typography>
-                                </div>
-                            </CardContent>
-                        </Card>
 
-                        {/* Active Experiments */}
-                        <Card className="shadow-sm">
-                            <CardContent>
-                                <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
-                                    Active Experiments
-                                </Typography>
+                <Card className="shadow-sm">
+                    <CardContent>
+                        <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
+                            Daily Inspiration
+                        </Typography>
 
-                                <div className="space-y-4">
-                                    {/* Morning Routine */}
-                                    <div className="border-l-4 border-blue-500 pl-4 py-2">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <Typography variant="subtitle1" className="font-medium text-gray-800">
-                                                Morning Routine Optimization
-                                            </Typography>
-                                        </div>
-                                        <Chip
-                                            label="12 days left"
-                                            size="small"
-                                            className="bg-blue-100 text-blue-700"
-                                        />
-                                    </div>
-
-                               =
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                </div>
+                        <div className="bg-blue-50 rounded-lg p-6">
+                            <Typography
+                                variant="body1"
+                                className="text-gray-700 italic leading-relaxed"
+                            >
+                                "{quote?.content}"
+                            </Typography>
+                            <Typography
+                                variant="caption"
+                                className="text-gray-500 mt-4 block text-right"
+                            >
+                                - {quote?.author}
+                            </Typography>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
+            {/* Two Column Layout */}
+            <div className="grid  grid-cols-3 gap-6">
+
+
+                {/* Active Experiments */}
+                <Card className="shadow-sm">
+                    <CardContent>
+                        <Typography variant="h6" className="font-semibold mb-4 text-gray-800">
+                            Active Experiments
+                        </Typography>
+
+                        <div className="space-y-4">
+                            {/* Morning Routine */}
+                            <div className="border-l-4 border-blue-500 pl-4 py-2">
+                                <div className="flex items-start justify-between mb-2">
+                                    <Typography variant="subtitle1" className="font-medium text-gray-800">
+                                        Morning Routine Optimization
+                                    </Typography>
+                                </div>
+                                <Chip
+                                    label="12 days left"
+                                    size="small"
+                                    className="bg-blue-100 text-blue-700"
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+
+
         </div>
     )
 }
