@@ -16,14 +16,17 @@ async function bootstrap() {
     new HttpExceptionFilter()
   );
 
+  const isDevelopment = configService.get<string>('NODE_ENV') !== 'production';
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000',
+    origin: isDevelopment
+      ? true
+      : configService.get<string>('CORS_ORIGIN') || 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-
-  await app.listen(configService.get<string>('PORT') ?? 5200, "0.0.0.0");
-
+  const PORT = configService.get<string>('PORT');
+  await app.listen(PORT ?? 5200, "0.0.0.0");
+  console.log(`Is working on port ${PORT}`)
 }
 bootstrap();
