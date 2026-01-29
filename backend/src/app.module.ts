@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { QuotesModule } from './quotes/quotes.module';
 import { HabitsModule } from './habits/habits.module';
+import { ExperimentsModule } from './experiments/experiments.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,7 +38,8 @@ import { HabitsModule } from './habits/habits.module';
     AuthModule,
     ProfilesModule,
     QuotesModule,
-    HabitsModule
+    HabitsModule,
+    ExperimentsModule
   ],
   controllers: [],
   providers: [],

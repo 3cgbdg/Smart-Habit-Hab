@@ -1,3 +1,4 @@
+import { Experiment } from "src/experiments/entities/experiments.entity";
 import { Habit } from "src/habits/entities/habit.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -15,4 +16,7 @@ export class User {
     updatedAt: Date;
     @OneToMany(() => Habit, habit => habit.user)
     habits: Habit[];
+
+    @OneToMany(() => Experiment, exp => exp.user)
+    experiments: Experiment[]
 }

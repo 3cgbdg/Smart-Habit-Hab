@@ -1,16 +1,12 @@
 import { User } from "src/users/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { HabitLog } from "./habit_log.enitity";
+import { Experiment } from "src/experiments/entities/experiments.entity";
 
 @Entity('habits')
 export class Habit {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @ManyToOne(() => User, user => user.habits, {
-    onDelete: 'CASCADE',
-  })
-  user: User;
 
   @Column({ type: 'uuid' })
   user_id: string;
@@ -29,4 +25,12 @@ export class Habit {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ManyToOne(() => User, user => user.habits, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
+
+  @OneToMany(() => Experiment, exp => exp.habit)
+  experiments: Experiment[]
 }
