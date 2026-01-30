@@ -5,6 +5,7 @@ export interface IHabit {
     createdAt?: string;
     updatedAt?: string;
     streak?: number;
+    completionRate?: number;
 }
 
 export interface IWeeklyStats {

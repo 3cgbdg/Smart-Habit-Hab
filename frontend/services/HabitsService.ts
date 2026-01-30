@@ -22,6 +22,16 @@ export class HabitsService {
         const response = await api.patch(`/habits/${habitId}/skip`);
         return response.data;
     }
+
+    async getMyHabits(): Promise<ApiResponse<IHabit[]>> {
+        const response = await api.get('/habits/my');
+        return response.data;
+    }
+
+    async getHabitById(habitId: string): Promise<ApiResponse<IHabit>> {
+        const response = await api.get(`/habits/${habitId}`);
+        return response.data;
+    }
 }
 
 const habitsService = new HabitsService();
