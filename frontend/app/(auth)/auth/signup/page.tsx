@@ -5,10 +5,8 @@ import { AuthFormData, AuthFormSchema } from "@/validation/AuthFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper, TextField, Typography, Link as MuiLink } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { error } from "console";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 

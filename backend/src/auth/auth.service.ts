@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/users.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -18,11 +17,8 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(dto.password, 10)
 
         const user = await this.userRepository.save({
-            id: uuidv4() as unknown as number,
             email: dto.email,
             password: hashedPassword,
-            createdAt: new Date(),
-            updatedAt: new Date(),
         })
         if (!user) {
             throw new InternalServerErrorException();
