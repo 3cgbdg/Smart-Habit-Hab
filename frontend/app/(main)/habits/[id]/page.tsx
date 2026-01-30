@@ -3,35 +3,38 @@
 import { useQuery } from "@tanstack/react-query"
 import habitsService from "@/services/HabitsService"
 import { useParams } from "next/navigation"
-import { useEffect } from "react"
-import { toast } from "react-toastify"
+import HabitForm from "@/components/habits/HabitForm"
+
+import { useState, useEffect } from "react"
 
 const Page = () => {
-    const params = useParams();
-    const habitId = params.id as string;
-
-    const { data: habit, isError: isHabitError, error: habitError } = useQuery({
-        queryKey: ['habit', habitId],
-        queryFn: async () => {
-            const data = await habitsService.getHabitById(habitId);
-            return data.data;
-        },
-        staleTime: 60 * 1000,
-        gcTime: 1000 * 60 * 60 * 24,
-    })
+    const [isMounted, setIsMounted] = useState(false);
+    const { id } = useParams() as { id: string };
 
     useEffect(() => {
-        if (isHabitError && habitError) {
-            toast.error(habitError.message);
-        }
-    }, [isHabitError, habitError]);
+        setIsMounted(true);
+    }, []);
+
+    const { data: habit, isLoading } = useQuery({
+        queryKey: ['habit', id],
+        queryFn: async () => {
+            const res = await habitsService.getHabitById(id);
+            return res.data;
+        },
+    })
+
+    if (!isMounted || isLoading) return <div className="p-10 text-center">Loading habit details...</div>
 
     return (
-        <div>
-            <h1>{habit?.name}</h1>
-            <p>{habit?.description}</p>
+        <div className="flex flex-col gap-6 items-center">
+            <div className="flex flex-col gap-2 text-center">
+                <h1 className="page-title text-3xl font-bold">Edit Habit</h1>
+                <p className="text-gray-500">Update your habit details below.</p>
+            </div>
+
+            {habit && <HabitForm mode="update" initialData={habit} />}
         </div>
     )
 }
 
-export default Page
+export default Page;

@@ -32,6 +32,16 @@ export class HabitsService {
         const response = await api.get(`/habits/${habitId}`);
         return response.data;
     }
+
+    async createHabit(data: { name: string, description?: string, isActive?: boolean }): Promise<ApiResponse<null>> {
+        const response = await api.post('/habits', data);
+        return response.data;
+    }
+
+    async updateHabit(id: string, data: { name: string, description?: string, isActive?: boolean }): Promise<ApiResponse<null>> {
+        const response = await api.patch(`/habits/${id}`, data);
+        return response.data;
+    }
 }
 
 const habitsService = new HabitsService();

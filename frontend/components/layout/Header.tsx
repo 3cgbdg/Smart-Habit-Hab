@@ -6,12 +6,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import authService from "@/services/AuthService";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 export default function Header() {
     const router = useRouter();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const menuOpen = Boolean(anchorEl);
-
+    const  {user} = useAppSelector(state=>state.profile)
     const navItems = [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Habits", href: "/habits" },
@@ -65,7 +66,8 @@ export default function Header() {
                         ))}
                     </Box>
                 </Box>
-
+                <div className="flex items-center gap-2">
+                    <p>{user?.email}</p>
                 {/* User menu icon */}
                 <IconButton
                     onClick={handleOpenMenu}
@@ -104,6 +106,7 @@ export default function Header() {
                         Logout
                     </MenuItem>
                 </Menu>
+                </div>
             </Toolbar>
         </AppBar>
     );

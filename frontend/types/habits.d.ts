@@ -6,9 +6,15 @@ export interface IHabit {
     updatedAt?: string;
     streak?: number;
     completionRate?: number;
+    isActive?: boolean;
 }
 
 export interface IWeeklyStats {
     day: string,
     count: number
+}
+
+interface IHabitFormProps {
+    mode: 'create' | 'update';
+    initialData?: IHabit;
 }

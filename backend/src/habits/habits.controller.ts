@@ -21,6 +21,11 @@ export class HabitsController {
     return this.habitsService.findMyHabits(req.user.id);
   }
 
+  @Get(":id")
+  async findHabitById(@Req() req: any, @Param('id') id: string): Promise<ReturnDataType<Habit>> {
+    return this.habitsService.findHabitById(req.user.id, id);
+  }
+
   @Get("relevant")
   async findRelevantHabits(@Req() req: any): Promise<ReturnDataType<Habit[]>> {
     return this.habitsService.findRelevantHabits(req.user.id);
@@ -43,4 +48,8 @@ export class HabitsController {
     return this.habitsService.skipHabit(req.user.id, habitId);
   }
 
+  @Patch("/:id")
+  async updateHabit(@Req() req: any, @Param('id') id: string, @Body() dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
+    return this.habitsService.updateHabit(req.user.id, id, dto);
+  }
 }

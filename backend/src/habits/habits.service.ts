@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
 import { Repository } from 'typeorm';
@@ -48,6 +48,18 @@ export class HabitsService {
         return { data: returnData };
     }
 
+    // getting havit by id
+    async findHabitById(userId: string, id: string): Promise<ReturnDataType<Habit>> {
+        const habit = await this.habitRepository.findOne({
+            where: { id: id, userId: userId },
+        });
+
+        if (!habit) {
+            throw new NotFoundException("Habit not found")
+        }
+        return { data: habit };
+    }
+
     // find habits that are relevant to user for the day
     async findRelevantHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
 
@@ -59,7 +71,7 @@ export class HabitsService {
             .andWhere('habit.isActive = :isActive', { isActive: true })
             .andWhere('(log.id IS NULL OR log.status = :status)', { status: Status.PENDING })
             .getMany();
-        
+
         return { data };
     }
 
@@ -94,5 +106,24 @@ export class HabitsService {
             await this.habitRepository.update({ id: habitId }, { streak: 0 });
         }
         return { data: null };
+    }
+
+    async updateHabit(userId: string, id: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
+        const habit = await this.habitRepository.findOne({
+            where: { id: id, userId: userId },
+        });
+
+        if (!habit) {
+            throw new NotFoundException("Habit not found")
+        }
+
+        habit.name = dto.name;
+        habit.description = dto.description;
+
+        if (dto.isActive !== undefined) {
+            habit.isActive = dto.isActive;
+        }
+
+        return { data: await this.habitRepository.save(habit) };
     }
 }

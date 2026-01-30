@@ -5,8 +5,11 @@ import habitsService from "@/services/HabitsService"
 import { useEffect } from "react"
 import { toast } from "react-toastify"
 import HabitCard from "@/components/dashboard/HabitCard"
+import { Button } from "@mui/material"
+import { useRouter } from "next/navigation"
 
 const Page = () => {
+    const router = useRouter();
 
     const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
         queryKey: ['all-habits'],
@@ -25,10 +28,12 @@ const Page = () => {
     }, [isHabitsError, habitsError]);
 
     return (
-        <div>
-            <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
+            <div className="flex  gap-6 justify-between items-center">
                 <h1 className="page-title">All Habits</h1>
-                <p className="text-gray">Manage your habits and experiments.</p>
+                <Button sx={{ borderRadius: 10, fontWeight: 600 }} variant="contained" color="primary" onClick={() => router.push('/habits/new')}>
+                    Create Habit
+                </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-4">

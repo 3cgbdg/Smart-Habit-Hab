@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateHabitDto {
     @IsString()
@@ -9,4 +9,8 @@ export class CreateHabitDto {
     @IsString()
     @IsOptional()
     description?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    isActive?: boolean;
 }
