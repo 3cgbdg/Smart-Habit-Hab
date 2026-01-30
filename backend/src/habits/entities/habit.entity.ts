@@ -1,15 +1,17 @@
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { HabitLog } from "../../habit_logs/entities/habit_log.enitity";
 import { Experiment } from "src/experiments/entities/experiments.entity";
 
 @Entity('habits')
+@Unique(['userId', 'name'])
+
 export class Habit {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'uuid' })
-  user_id: string;
+  userId: string;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
@@ -21,10 +23,13 @@ export class Habit {
   logs: HabitLog[];
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @Column({ default: 0 })
   streak: number;

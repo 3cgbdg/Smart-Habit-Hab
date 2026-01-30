@@ -1,35 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { Between, In, Repository } from 'typeorm';
-import { HabitLog } from '../habit_logs/entities/habit_log.enitity';
+import { Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
+import { ReturnDataType } from 'src/types/common';
+import { IWeeklyStats } from 'src/types/habits';
+import { Status } from 'src/habit_logs/entities/habit_log.enitity';
 
 @Injectable()
 export class HabitsService {
     constructor(
         @InjectRepository(Habit)
         private readonly habitRepository: Repository<Habit>,
-        @InjectRepository(HabitLog)
-        private readonly habitLogRepository: Repository<HabitLog>,
         private readonly habitLogsService: HabitLogsService
     ) { }
 
     // creating habit
-    async create(userId: string, dto: CreateHabitDto): Promise<Habit> {
+    async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
         const habit = this.habitRepository.create({
             ...dto,
-            user_id: userId,
+            userId: userId,
         });
-        return this.habitRepository.save(habit);
+        return { data: await this.habitRepository.save(habit) };
     }
 
     // getting habits of user with completion rate
-    async findMyHabits(userId: string) {
+    async findMyHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
         const habits = await this.habitRepository.find({
-            where: { user_id: userId },
-            order: { created_at: 'DESC' },
+            where: { userId: userId },
+            order: { createdAt: 'DESC' },
             select: {
                 id: true,
                 name: true,
@@ -45,70 +45,54 @@ export class HabitsService {
             completionRate: stats[h.id],
         }));
 
-        return returnData;
+        return { data: returnData };
     }
 
     // find habits that are relevant to user for the day
-    async findRelevantHabits(userId: string) {
-        const habits = await this.habitRepository.find({
-            where: { user_id: userId },
-            order: { created_at: 'DESC' },
-            select: {
-                id: true,
-                name: true,
-                streak: true,
-            }
-        });
+    async findRelevantHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
 
-        return habits;
+
+        const data = await this.habitRepository.createQueryBuilder('habit')
+            .leftJoin('habit.logs', 'log')
+            .select(['habit.id', 'habit.name', 'habit.streak'])
+            .where('habit.userId = :userId', { userId })
+            .andWhere('habit.isActive = :isActive', { isActive: true })
+            .andWhere('(log.id IS NULL OR log.status = :status)', { status: Status.PENDING })
+            .getMany();
+        
+        return { data };
     }
 
     // weekly stats for all habits of user 
-    async getWeeklyStats(userId: string) {
-        const today = new Date();
-        const dayOfWeek = today.getDay();
-        const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-        const startOfWeek = new Date(today.setDate(diff));
-        startOfWeek.setHours(0, 0, 0, 0);
-
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        endOfWeek.setHours(23, 59, 59, 999);
-
+    async getWeeklyStats(userId: string): Promise<ReturnDataType<IWeeklyStats[]>> {
         const habits = await this.habitRepository.find({
-            where: { user_id: userId },
+            where: { userId: userId },
         });
 
-        if (habits.length === 0) return [];
+        if (habits.length === 0) return { data: [] };
 
         const habitIds = habits.map(h => h.id);
 
+        const stats = await this.habitLogsService.getWeeklyStats(habitIds);
 
-        const logs = await this.habitLogRepository.find({
-            where: {
-                habit_id: In(habitIds),
-                date: Between(
-                    startOfWeek.toISOString().split('T')[0],
-                    endOfWeek.toISOString().split('T')[0]
-                ),
-            },
-        });
-
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const stats = days.map(day => ({ day, count: 0 }));
-
-        logs.forEach(log => {
-            const date = new Date(log.date);
-            let dayIndex = date.getDay() - 1;
-            if (dayIndex === -1) dayIndex = 6;
-            if (stats[dayIndex]) {
-                stats[dayIndex].count++;
-            }
-        });
-
-        return stats;
+        return { data: stats };
     }
 
 
 
+    async completeHabit(userId: string, habitId: string): Promise<ReturnDataType<null>> {
+        const isGood = await this.habitLogsService.completeLog(habitId);
+        if (isGood) {
+            await this.habitRepository.increment({ id: habitId }, 'streak', 1);
+        }
+        return { data: null };
+    }
+
+    async skipHabit(userId: string, habitId: string): Promise<ReturnDataType<null>> {
+        const isGood = await this.habitLogsService.skipLog(habitId);
+        if (isGood) {
+            await this.habitRepository.update({ id: habitId }, { streak: 0 });
+        }
+        return { data: null };
+    }
 }

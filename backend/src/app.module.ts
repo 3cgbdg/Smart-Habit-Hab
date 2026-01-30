@@ -22,8 +22,8 @@ import { HabitLogsModule } from './habit_logs/habit_logs.module';
       password: 'postgres',
       database: 'smart_habit',
       autoLoadEntities: true,
-      synchronize: true,
-      dropSchema: true,
+      synchronize: false,
+      dropSchema: false,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

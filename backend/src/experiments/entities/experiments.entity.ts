@@ -23,7 +23,6 @@ export class Experiment {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    /* ---------- relations ---------- */
 
     @ManyToOne(() => User, user => user.experiments, {
         onDelete: 'CASCADE',
@@ -39,7 +38,7 @@ export class Experiment {
     habit: Habit;
 
     @Column({ type: 'uuid' })
-    habit_id: string;
+    habitId: string;
 
     @Column({ type: 'varchar', length: 255 })
     name: string;
@@ -48,10 +47,10 @@ export class Experiment {
     variable: string;
 
     @Column({ type: 'date' })
-    start_date: string;
+    startDate: string;
 
     @Column({ type: 'date', nullable: true })
-    end_date?: string;
+    endDate?: string;
 
     @Column({
         type: 'enum',
@@ -64,5 +63,6 @@ export class Experiment {
     results: ExperimentResult[];
 
     @CreateDateColumn()
-    created_at: Date;
+    createdAt: Date;
 }
+    

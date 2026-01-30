@@ -1,32 +1,74 @@
 "use client"
 
+import habitsService from "@/services/HabitsService";
 import quoteService from "@/services/QuoteService";
 import { Button, Card, CardContent, Chip, Paper, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react"
+import { Check, Flame } from "lucide-react"
+import { toast } from "react-toastify";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useEffect } from "react";
+import HabitCard from "@/components/dashboard/HabitCard";
 
 const Page = () => {
 
-    const habitData = [
-        { day: 'Mon', value: 2 },
-        { day: 'Tue', value: 3 },
-        { day: 'Wed', value: 4 },
-        { day: 'Thu', value: 2.5 },
-        { day: 'Fri', value: 4 },
-        { day: 'Sat', value: 3 },
-        { day: 'Sun', value: 2 },
-    ];
-
-    const { data: quote } = useQuery({
+    const { data: quote, isError: isQuoteError, error: quoteError } = useQuery({
         queryKey: ['random-quote'],
         queryFn: async () => {
             const data = await quoteService.getRandomQuote();
             return data.data;
         },
+        staleTime: 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
 
     })
 
+    useEffect(() => {
+        if (isQuoteError && quoteError) {
+            toast.error(quoteError.message);
+        }
+    }, [isQuoteError, quoteError]);
+
+    // get endpoints
+    const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
+        queryKey: ['relevant-habits'],
+        queryFn: async () => {
+            const data = await habitsService.getRelevantHabits();
+            return data.data;
+        },
+        staleTime: 60 * 1000,
+        gcTime: 1000 * 60 * 60 * 24,
+    })
+
+    const { data: weeklyStats, isError: isWeeklyStatsError, error: weeklyStatsError } = useQuery({
+        queryKey: ['weekly-stats'],
+        queryFn: async () => {
+            const data = await habitsService.getWeeklyStats();
+            return data.data;
+        },
+        staleTime: 60 * 1000,
+        gcTime: 1000 * 60 * 60 * 24,
+    })
+    //
+
+
+    // handling errors
+    useEffect(() => {
+        if (isHabitsError && habitsError) {
+            toast.error(habitsError.message);
+        }
+    }, [isHabitsError, habitsError]);
+
+
+
+    useEffect(() => {
+        if (isWeeklyStatsError && weeklyStatsError) {
+            toast.error(weeklyStatsError.message);
+        }
+    }, [isWeeklyStatsError, weeklyStatsError]);
+
+    //
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-6">
@@ -37,34 +79,21 @@ const Page = () => {
                 <h2 className="section-title">
                     Today's Habits
                 </h2>
-                <div className="grid grid-cols-3">
-                    <Paper
-                        elevation={3}
-                        className="flex flex-col min-h-[140px]"
-                        sx={{ p: 4, width: "100%", borderRadius: 3 }}
-                    >
 
-                        <div className="flex flex-col gap-2">
-                            <h3 className="text-lg leading-7 font-medium">Medium1</h3>
-                            <p className="text-sm leading-5 text-gray-500">Smthing</p>
-                        </div>
 
-                        <Button
-                            className="w-fit"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                                mt: "auto",
-                                ml: "auto",
-                                borderRadius: 2,
-                                height: 44,
-                            }}
-                        >
-                            <Check size={20} />
-                        </Button>
+                {habits && habits.length > 0 ?
+                    <div className="grid grid-cols-3">
+                        {habits.map(h => (
+                            <div key={h.id} className="">
+                                <HabitCard habit={h} />
+                            </div>
+                        ))}
+                    </div>
+                    : <Paper elevation={3} className="p-4 text-center text-gray-500  w-full">
+                        <Typography sx={{ fontSize: "2rem" }} variant="body1">🗑️.....</Typography>
                     </Paper>
+                }
 
-                </div>
             </div>
 
 
@@ -86,7 +115,7 @@ const Page = () => {
                                 Habit Completion Trends
                             </Typography>
                             <ResponsiveContainer width="100%" height={200}>
-                                <LineChart data={habitData}>
+                                <LineChart data={weeklyStats || []}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                     <XAxis
                                         dataKey="day"
@@ -96,11 +125,12 @@ const Page = () => {
                                     <YAxis
                                         tick={{ fontSize: 12 }}
                                         stroke="#999"
+                                        allowDecimals={false}
                                     />
                                     <Tooltip />
                                     <Line
                                         type="monotone"
-                                        dataKey="value"
+                                        dataKey="count"
                                         stroke="#3b82f6"
                                         strokeWidth={2}
                                         dot={{ fill: '#3b82f6', r: 4 }}

@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Un
 import { Experiment } from "./experiments.entity";
 
 @Entity('experiment_results')
-@Unique(['experiment_id', 'date'])
+@Unique(['experimentId', 'date'])
 export class ExperimentResult {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -13,7 +13,7 @@ export class ExperimentResult {
   experiment: Experiment;
 
   @Column({ type: 'uuid' })
-  experiment_id: string;
+  experimentId: string;
 
   @Column({ type: 'date' })
   date: string; 
@@ -25,5 +25,5 @@ export class ExperimentResult {
   note?: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }

@@ -11,6 +11,6 @@ export class ProfilesController {
   @Get("me")
   @UseGuards(AuthGuard('jwt'))
   async profile(@Req() request: Request): Promise<any | null> {
-    return this.profilesService.getOwnProfile((request as any).userId)
+    return this.profilesService.getOwnProfile((request as any).user.id)
   }
 }
