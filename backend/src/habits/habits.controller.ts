@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { HabitsService } from './habits.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHabitDto } from './dto/create-habit.dto';
@@ -17,8 +17,8 @@ export class HabitsController {
   }
 
   @Get("my")
-  async findMyHabits(@Req() req: any): Promise<ReturnDataType<Habit[]>> {
-    return this.habitsService.findMyHabits(req.user.id);
+  async findMyHabits(@Req() req: any, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number): Promise<ReturnDataType<{ habits: Habit[], total: number }>> {
+    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage);
   }
 
   @Get(":id")

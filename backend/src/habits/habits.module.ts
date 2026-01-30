@@ -9,7 +9,7 @@ import { HabitCron } from "./habit.cron";
   imports: [TypeOrmModule.forFeature([Habit]),
     HabitLogsModule
   ],
-  controllers: [HabitsController, HabitCron],
-  providers: [HabitsService],
+  controllers: [HabitsController],
+  providers: [HabitsService, HabitCron],
 })
 export class HabitsModule { }

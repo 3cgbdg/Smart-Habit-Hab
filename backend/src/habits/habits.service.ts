@@ -26,16 +26,19 @@ export class HabitsService {
     }
 
     // getting habits of user with completion rate
-    async findMyHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
-        const habits = await this.habitRepository.find({
-            where: { userId: userId },
-            order: { createdAt: 'DESC' },
-            select: {
-                id: true,
-                name: true,
-                streak: true,
-            }
-        });
+    async findMyHabits(userId: string, page: number, itemsPerPage: number): Promise<ReturnDataType<{ habits: Habit[], total: number }>> {
+
+        const qb = this.habitRepository
+            .createQueryBuilder("habit")
+            .where("habit.userId = :userId", { userId });
+
+        const total = await qb.getCount();
+
+        const habits = await qb
+            .orderBy("habit.createdAt", "DESC")
+            .skip((page - 1) * itemsPerPage)
+            .take(itemsPerPage)
+            .getMany();
 
         const habitIds = habits.map(h => h.id);
 
@@ -45,7 +48,8 @@ export class HabitsService {
             completionRate: stats[h.id],
         }));
 
-        return { data: returnData };
+
+        return { data: { habits: returnData, total } };
     }
 
     // getting havit by id

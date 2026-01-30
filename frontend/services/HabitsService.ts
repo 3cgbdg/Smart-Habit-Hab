@@ -23,8 +23,13 @@ export class HabitsService {
         return response.data;
     }
 
-    async getMyHabits(): Promise<ApiResponse<IHabit[]>> {
-        const response = await api.get('/habits/my');
+    async getMyHabits(page: number, itemsPerPage: number): Promise<ApiResponse<{ habits: IHabit[], total: number }>> {
+        const response = await api.get('/habits/my', {
+            params: {
+                page,
+                itemsPerPage
+            }
+        });
         return response.data;
     }
 

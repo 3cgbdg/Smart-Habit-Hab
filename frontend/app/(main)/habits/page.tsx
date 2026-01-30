@@ -2,19 +2,21 @@
 
 import { useQuery } from "@tanstack/react-query"
 import habitsService from "@/services/HabitsService"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { toast } from "react-toastify"
 import HabitCard from "@/components/dashboard/HabitCard"
-import { Button } from "@mui/material"
-import { useRouter } from "next/navigation"
+import { Button, Pagination, Box } from "@mui/material"
+import { useRouter, useSearchParams } from "next/navigation"
 
 const Page = () => {
     const router = useRouter();
-
-    const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['all-habits'],
+    const searchParams = useSearchParams();
+    const page = Number(searchParams.get("page")) || 1;
+    const itemsPerPage = 1;
+    const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
+        queryKey: ['all-habits', page],
         queryFn: async () => {
-            const data = await habitsService.getMyHabits();
+            const data = await habitsService.getMyHabits(page, itemsPerPage);
             return data.data;
         },
         staleTime: 60 * 1000,
@@ -27,6 +29,14 @@ const Page = () => {
         }
     }, [isHabitsError, habitsError]);
 
+
+
+
+    const handlePageChange = (value: number) => {
+        router.push(`/habits?page=${value}`);
+    };
+
+    const totalPages = useMemo(() => (habitsData ? Math.ceil(habitsData.total / itemsPerPage) : 0), [habitsData])
     return (
         <div className="flex flex-col gap-6">
             <div className="flex  gap-6 justify-between items-center">
@@ -37,12 +47,23 @@ const Page = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-                {habits?.map(h => (
+                {habitsData?.habits?.map(h => (
                     <div key={h.id} className="">
                         <HabitCard type='all' habit={h} />
                     </div>
                 ))}
             </div>
+
+            {habitsData && habitsData.total > itemsPerPage && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(e, value) => handlePageChange(value)}
+                        color="primary"
+                    />
+                </Box>
+            )}
         </div>
     )
 }
