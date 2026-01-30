@@ -18,7 +18,6 @@ export class HabitsController {
 
   @Get("my")
   async findMyHabits(@Req() req: any): Promise<ReturnDataType<Habit[]>> {
-    console.log(req.user.id);
     return this.habitsService.findMyHabits(req.user.id);
   }
 
@@ -39,9 +38,9 @@ export class HabitsController {
     return this.habitsService.completeHabit(req.user.id, habitId);
   }
 
-    @Patch("/:habitId/skip")
-    async skipHabit(@Req() req: any, @Param('habitId') habitId: string): Promise<ReturnDataType<null>> {
-        return this.habitsService.skipHabit(req.user.id, habitId);
-    }
-   
+  @Patch("/:habitId/skip")
+  async skipHabit(@Req() req: any, @Param('habitId') habitId: string): Promise<ReturnDataType<null>> {
+    return this.habitsService.skipHabit(req.user.id, habitId);
+  }
+
 }
