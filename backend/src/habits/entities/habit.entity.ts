@@ -1,6 +1,6 @@
-import { User } from "src/users/user.entity";
+import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { HabitLog } from "./habit_log.enitity";
+import { HabitLog } from "../../habit_logs/entities/habit_log.enitity";
 import { Experiment } from "src/experiments/entities/experiments.entity";
 
 @Entity('habits')
@@ -25,6 +25,9 @@ export class Habit {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column({ default: 0 })
+  streak: number;
 
   @ManyToOne(() => User, user => user.habits, {
     onDelete: 'CASCADE',

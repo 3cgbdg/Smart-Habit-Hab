@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Habit } from "./habit.entity";
+import { Habit } from "../../habits/entities/habit.entity";
 
 @Entity('habit_logs')
 @Unique(['habit_id', 'date'])
@@ -16,7 +16,7 @@ export class HabitLog {
     habit_id: string;
 
     @Column({ type: 'date' })
-    date: string; 
+    date: string;
 
     @Column({ type: 'boolean', default: true })
     completed: boolean;

@@ -1,9 +1,15 @@
-import { Module } from '@nestjs/common';
-import { HabitsService } from './habits.service';
-import { HabitsController } from './habits.controller';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Habit } from "./entities/habit.entity";
+import { HabitsController } from "./habits.controller";
+import { HabitsService } from "./habits.service";
+import { HabitLogsModule } from "src/habit_logs/habit_logs.module";
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Habit]),
+    HabitLogsModule
+  ],
   controllers: [HabitsController],
   providers: [HabitsService],
 })
-export class HabitsModule {}
+export class HabitsModule { }

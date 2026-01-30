@@ -7,12 +7,12 @@ import { ConfigService } from '@nestjs/config';
 import { GeneralAuthDto } from './dto/general-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly configService: ConfigService, private readonly authService: AuthService, private readonly jwtService: JwtService,
-    @InjectRepository(User) private readonly userRepository:Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>
   ) { }
 
   @Post("signup")
@@ -56,7 +56,7 @@ export class AuthController {
   }
 
 
- 
+
 
   @Post('refresh')
   async refreshToken(@Req() req: Request, @Res() res: Response): Promise<Response<any, Record<string, any>>> {

@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
 } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { ExperimentResult } from './experiment_results.entity';
 
 
@@ -45,7 +45,7 @@ export class Experiment {
     name: string;
 
     @Column({ type: 'varchar', length: 255 })
-    variable: string; 
+    variable: string;
 
     @Column({ type: 'date' })
     start_date: string;

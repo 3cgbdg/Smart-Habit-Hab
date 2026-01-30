@@ -4,7 +4,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { User } from "src/users/user.entity";
+import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        const userId = await this.userRepository.findOne({ where: { id: payload.userId } ,select: { id: true }});
+        const userId = await this.userRepository.findOne({ where: { id: payload.userId }, select: { id: true } });
         if (!userId)
             throw new NotFoundException();
         return userId;
