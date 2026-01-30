@@ -27,12 +27,13 @@ export class HabitLogsService {
         const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
 
         const stats = await this.habitLogRepository.createQueryBuilder('habit_log')
-            .select('habit_log.habit_id', 'habitId')
+            .select('habit_log.habitId', 'habitId')
             .addSelect('COUNT(*)', 'total')
-            .addSelect('SUM(CASE WHEN habit_log.completed = true THEN 1 ELSE 0 END)', 'completed')
+            .addSelect('SUM(CASE WHEN habit_log.status = :status THEN 1 ELSE 0 END)', 'completed')
             .where('habit_log.date BETWEEN :firstDayOfMonth AND :lastDayOfMonth', { firstDayOfMonth, lastDayOfMonth })
-            .andWhere('habit_log.habit_id IN (:...habitIds)', { habitIds })
-            .groupBy('habit_log.habit_id')
+            .andWhere('habit_log.habitId IN (:...habitIds)', { habitIds })
+            .setParameter('status', Status.COMPLETED)
+            .groupBy('habit_log.habitId')
             .getRawMany();
 
         const result: Record<string, number> = {};
@@ -65,6 +66,7 @@ export class HabitLogsService {
         const logs = await this.habitLogRepository.find({
             where: {
                 habitId: In(habitIds),
+                status: Status.COMPLETED,
                 date: Between(
                     startOfWeek.toISOString().split('T')[0],
                     endOfWeek.toISOString().split('T')[0]
