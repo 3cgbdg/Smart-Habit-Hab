@@ -7,8 +7,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { QuotesModule } from './quotes/quotes.module';
 import { ExperimentsModule } from './experiments/experiments.module';
-  import { HabitsModule } from './habits/habits.module';
+import { HabitsModule } from './habits/habits.module';
 import { HabitLogsModule } from './habit_logs/habit_logs.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +26,7 @@ import { HabitLogsModule } from './habit_logs/habit_logs.module';
       synchronize: false,
       dropSchema: false,
     }),
+    ScheduleModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

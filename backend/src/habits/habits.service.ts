@@ -126,4 +126,24 @@ export class HabitsService {
 
         return { data: await this.habitRepository.save(habit) };
     }
+
+    // CRON for creating  logs
+    async createDailyLogs() {
+        const today = new Date().toISOString().split('T')[0];
+        // batch processing
+        const BATCH_SIZE = 1000;
+        let offset = 0;
+
+        while (true) {
+            const habits = await this.habitRepository.find({
+                take: BATCH_SIZE,
+                skip: offset,
+            });
+            if (habits.length === 0) break;
+            for (const habit of habits) {
+                await this.habitLogsService.create(habit.id, today, Status.PENDING);
+            }
+            offset += BATCH_SIZE;
+        }
+    }
 }
