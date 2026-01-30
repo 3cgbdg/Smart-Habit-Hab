@@ -20,6 +20,7 @@ export class HabitsController {
 
   @Get("relevant")
   async findRelevant(@Req() req: any) {
+    return this.habitsService.findRelevantHabits(req.userId);
   }
 
 
