@@ -1,11 +1,19 @@
-import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { HabitLog } from "../../habit_logs/entities/habit_log.enitity";
-import { Experiment } from "src/experiments/entities/experiments.entity";
+import { User } from 'src/users/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
+import { HabitLog } from '../../habit_logs/entities/habit_log.enitity';
+import { Experiment } from 'src/experiments/entities/experiments.entity';
 
 @Entity('habits')
 @Unique(['userId', 'name'])
-
 export class Habit {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -19,7 +27,7 @@ export class Habit {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @OneToMany(() => HabitLog, log => log.habit)
+  @OneToMany(() => HabitLog, (log) => log.habit)
   logs: HabitLog[];
 
   @CreateDateColumn()
@@ -34,11 +42,11 @@ export class Habit {
   @Column({ default: 0 })
   streak: number;
 
-  @ManyToOne(() => User, user => user.habits, {
+  @ManyToOne(() => User, (user) => user.habits, {
     onDelete: 'CASCADE',
   })
   user: User;
 
-  @OneToMany(() => Experiment, exp => exp.habit)
-  experiments: Experiment[]
+  @OneToMany(() => Experiment, (exp) => exp.habit)
+  experiments: Experiment[];
 }

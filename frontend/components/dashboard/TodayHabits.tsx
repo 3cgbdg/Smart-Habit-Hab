@@ -12,7 +12,7 @@ const TodayHabits = ({ habits }: TodayHabitsProps) => {
     return (
         <div className="flex flex-col gap-6">
             <h2 className="section-title">
-                Today's Habits
+                Today&apos;s Habits
             </h2>
 
             {habits && habits.length > 0 ?

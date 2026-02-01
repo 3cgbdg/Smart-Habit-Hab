@@ -8,6 +8,6 @@ import { HabitLog } from './entities/habit_log.enitity';
   imports: [TypeOrmModule.forFeature([HabitLog])],
   controllers: [HabitLogsController],
   providers: [HabitLogsService],
-  exports: [HabitLogsService]
+  exports: [HabitLogsService],
 })
-export class HabitLogsModule { }
+export class HabitLogsModule {}

@@ -12,9 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   // global filter
-  app.useGlobalFilters(
-    new HttpExceptionFilter()
-  );
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const isDevelopment = configService.get<string>('NODE_ENV') !== 'production';
   app.enableCors({
@@ -26,7 +24,10 @@ async function bootstrap() {
   });
 
   const PORT = configService.get<string>('PORT');
-  await app.listen(PORT ?? 5200, "0.0.0.0");
-  console.log(`Is working on port ${PORT}`)
+  await app.listen(PORT ?? 5200, '0.0.0.0');
+  console.log(`Is working on port ${PORT}`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

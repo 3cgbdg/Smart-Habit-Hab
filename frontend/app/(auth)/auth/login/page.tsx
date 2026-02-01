@@ -9,6 +9,7 @@ import authService from '@/services/AuthService';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/hooks/reduxHooks';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,8 +31,9 @@ export default function LoginPage() {
       toast.success(data);
       router.push("/dashboard")
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message || err.message || "Login failed");
+    onError: (err: unknown) => {
+      const error = err as AxiosError<{ message: string }>;
+      toast.error(error?.response?.data?.message || error.message || "Login failed");
     }
   });
 

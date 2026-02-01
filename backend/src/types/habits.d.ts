@@ -1,9 +1,9 @@
 export interface IWeeklyStats {
-    day: string,
-    count: number
+  day: string;
+  count: number;
 }
 
 export interface IMonthlyStats {
-    habitId: string,
-    completionRate: number
+  habitId: string;
+  completionRate: number;
 }

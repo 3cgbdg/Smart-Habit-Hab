@@ -5,13 +5,18 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfilesService {
-    constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) { }
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
-    async getOwnProfile(myId: string) {
-        const user = await this.userRepository.findOne({ where: { id: myId }, select: { id: true, email: true } })
-        if (user) {
-            return user;
-        }
-        return null;
+  async getOwnProfile(myId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: myId },
+      select: { id: true, email: true },
+    });
+    if (user) {
+      return user;
     }
+    return null;
+  }
 }

@@ -5,6 +5,7 @@ import { AuthFormData, AuthFormSchema } from "@/validation/AuthFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper, TextField, Typography, Link as MuiLink } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -33,8 +34,9 @@ export default function SignupPage() {
       router.push("/dashboard")
 
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message || err.message || "Login failed");
+    onError: (err: unknown) => {
+      const error = err as AxiosError<{ message: string }>;
+      toast.error(error?.response?.data?.message || error.message || "Login failed");
     }
   });
 

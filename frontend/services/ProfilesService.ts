@@ -1,6 +1,5 @@
-import { ApiResponse, IUser } from "@/types/general";
+import { IUser } from "@/types/general";
 import { api } from "./axiosInstance";
-import { AuthFormData } from "@/validation/AuthFormSchema";
 
 class ProfilesService {
 
