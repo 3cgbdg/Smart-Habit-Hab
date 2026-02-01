@@ -14,7 +14,7 @@ export class HabitsService {
     @InjectRepository(Habit)
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
-  ) { }
+  ) {}
 
   // creating habit
   async create(

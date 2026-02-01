@@ -20,7 +20,7 @@ import type { AuthRequest } from 'src/types/auth';
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
 export class HabitsController {
-  constructor(private readonly habitsService: HabitsService) {}
+  constructor(private readonly habitsService: HabitsService) { }
 
   @Post()
   async create(
@@ -39,14 +39,6 @@ export class HabitsController {
     return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage);
   }
 
-  @Get(':id')
-  async findHabitById(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-  ): Promise<ReturnDataType<Habit>> {
-    return this.habitsService.findHabitById(req.user.id, id);
-  }
-
   @Get('relevant')
   async findRelevantHabits(
     @Req() req: AuthRequest,
@@ -59,6 +51,14 @@ export class HabitsController {
     @Req() req: AuthRequest,
   ): Promise<ReturnDataType<IWeeklyStats[]>> {
     return this.habitsService.getWeeklyStats(req.user.id);
+  }
+
+  @Get(':id')
+  async findHabitById(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+  ): Promise<ReturnDataType<Habit>> {
+    return this.habitsService.findHabitById(req.user.id, id);
   }
 
   @Patch('/:habitId/complete')

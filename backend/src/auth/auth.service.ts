@@ -17,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async signup(
     dto: GeneralAuthDto,

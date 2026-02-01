@@ -26,7 +26,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   @Post('signup')
   async signup(
@@ -148,4 +148,3 @@ export class AuthController {
     return res.json({ message: 'Successfully logged out!' });
   }
 }
-
