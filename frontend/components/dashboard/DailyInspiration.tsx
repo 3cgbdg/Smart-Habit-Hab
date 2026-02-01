@@ -22,8 +22,8 @@ const DailyInspiration = ({ quote }: DailyInspirationProps) => {
                         variant="body1"
                         className="text-gray-700 italic leading-relaxed"
                     >
-                        "{quote?.content || "Loading inspiration..."}"
-                    </Typography>
+                        &quot;{quote?.content || "Loading inspiration..."}&quot;
+                    </Typography>   
                     <Typography
                         variant="caption"
                         className="text-gray-500 mt-4 block text-right"

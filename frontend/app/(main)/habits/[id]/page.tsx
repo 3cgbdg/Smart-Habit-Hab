@@ -5,15 +5,10 @@ import habitsService from "@/services/HabitsService"
 import { useParams } from "next/navigation"
 import HabitForm from "@/components/habits/HabitForm"
 
-import { useState, useEffect } from "react"
-
 const Page = () => {
-    const [isMounted, setIsMounted] = useState(false);
     const { id } = useParams() as { id: string };
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
+
 
     const { data: habit, isLoading } = useQuery({
         queryKey: ['habit', id],
@@ -23,7 +18,7 @@ const Page = () => {
         },
     })
 
-    if (!isMounted || isLoading) return <div className="p-10 text-center">Loading habit details...</div>
+    if (isLoading) return <div className="p-10 text-center">Loading habit details...</div>
 
     return (
         <div className="flex flex-col gap-6 items-center">

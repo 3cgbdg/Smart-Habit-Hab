@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { HabitFormData, habitSchema } from "@/validation/HabitFormSchema";
 import { IHabitFormProps } from "@/types/habits";
-import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 
 
 
@@ -17,7 +17,6 @@ import { useEffect, useState } from "react";
 const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
     const queryClient = useQueryClient();
     const router = useRouter();
-    const [isMounted, setIsMounted] = useState(false);
     const {
         register,
         handleSubmit,
@@ -49,8 +48,9 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
             }
             router.push('/habits');
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || "Something went wrong");
+        onError: (error: unknown) => {
+            const err = error as AxiosError<{ message: string }>;
+            toast.error(err?.response?.data?.message || err.message || "Something went wrong");
         }
     });
 
@@ -58,13 +58,9 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
         mutation.mutate(data);
     };
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
     return (
         <>
-            {isMounted && (
+             
                 <Box
                     component="form"
                     onSubmit={handleSubmit(onSubmit)}
@@ -128,7 +124,7 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
                         {mutation.isPending ? "Saving..." : mode === 'create' ? "Create Habit" : "Update Habit"}
                     </Button>
                 </Box>
-            )}
+            
         </>
     );
 };

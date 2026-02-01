@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, Paper } from "@mui/material"
+import { Card, CardContent } from "@mui/material"
 import { Button } from "@mui/material"
 import { Check, CircleCheckBig, Flame, Minus } from "lucide-react"
 import { IHabit } from "@/types/habits"
