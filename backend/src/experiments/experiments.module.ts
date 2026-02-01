@@ -10,4 +10,4 @@ import { ExperimentsController } from './experiments.controller';
   controllers: [ExperimentsController],
   providers: [ExperimentsService],
 })
-export class ExperimentsModule { }
+export class ExperimentsModule {}

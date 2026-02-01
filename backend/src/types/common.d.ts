@@ -1,8 +1,8 @@
 export interface IReturnMessage {
-    message?: string
+  message?: string;
 }
 
 export type ReturnDataType<T> = {
-    message?: string,
-    data: T
-}
+  message?: string;
+  data: T;
+};

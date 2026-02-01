@@ -9,4 +9,4 @@ import { User } from 'src/users/entities/user.entity';
   controllers: [ProfilesController],
   providers: [ProfilesService],
 })
-export class ProfilesModule { }
+export class ProfilesModule {}

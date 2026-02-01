@@ -4,11 +4,13 @@ import { QuotesController } from './quotes.controller';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [HttpModule.register({
-    timeout: 15000,
-    maxRedirects: 5
-  }),],
+  imports: [
+    HttpModule.register({
+      timeout: 15000,
+      maxRedirects: 5,
+    }),
+  ],
   controllers: [QuotesController],
   providers: [QuotesService],
 })
-export class QuotesModule { }
+export class QuotesModule {}

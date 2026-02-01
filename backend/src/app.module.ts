@@ -33,7 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       global: true,
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '15m' }
+        signOptions: { expiresIn: '15m' },
       }),
     }),
     UsersModule,
@@ -42,9 +42,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     ProfilesModule,
     QuotesModule,
-    HabitLogsModule
+    HabitLogsModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

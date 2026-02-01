@@ -1,5 +1,12 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Experiment } from "./experiments.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { Experiment } from './experiments.entity';
 
 @Entity('experiment_results')
 @Unique(['experimentId', 'date'])
@@ -7,7 +14,7 @@ export class ExperimentResult {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Experiment, experiment => experiment.results, {
+  @ManyToOne(() => Experiment, (experiment) => experiment.results, {
     onDelete: 'CASCADE',
   })
   experiment: Experiment;
@@ -16,7 +23,7 @@ export class ExperimentResult {
   experimentId: string;
 
   @Column({ type: 'date' })
-  date: string; 
+  date: string;
 
   @Column({ type: 'boolean' })
   success: boolean;
