@@ -15,16 +15,20 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'smart_habit',
-      autoLoadEntities: true,
-      synchronize: false,
-      dropSchema: false,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        dropSchema: false,
+      }),
     }),
     ScheduleModule.forRoot(),
     JwtModule.registerAsync({
@@ -47,4 +51,4 @@ import { ScheduleModule } from '@nestjs/schedule';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

@@ -26,7 +26,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   @Post('signup')
   async signup(
@@ -127,7 +127,7 @@ export class AuthController {
   }
 
   @Delete('logout')
-  logout(@Res() res: Response): { message: string } {
+  logout(@Res() res: Response): Response {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: this.configService.get<string>('NODE_ENV') === 'production',
@@ -145,6 +145,7 @@ export class AuthController {
           : 'lax',
     });
 
-    return { message: 'Successfully logged out!' };
+    return res.json({ message: 'Successfully logged out!' });
   }
 }
+
