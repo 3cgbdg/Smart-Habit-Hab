@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
@@ -14,7 +14,7 @@ export class HabitsService {
     @InjectRepository(Habit)
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
-  ) {}
+  ) { }
 
   // creating habit
   async create(
@@ -155,18 +155,18 @@ export class HabitsService {
     const today = new Date().toISOString().split('T')[0];
     // batch processing
     const BATCH_SIZE = 1000;
-    let offset = 0;
-
+    let lastId: string | null = null;
     while (true) {
       const habits = await this.habitRepository.find({
         take: BATCH_SIZE,
-        skip: offset,
+        where: lastId ? { id: MoreThan(lastId) } : {},
+        order: { id: 'ASC' },
       });
       if (habits.length === 0) break;
       for (const habit of habits) {
         await this.habitLogsService.create(habit.id, today, Status.PENDING);
       }
-      offset += BATCH_SIZE;
+      lastId = habits[habits.length - 1].id;
     }
   }
 }
