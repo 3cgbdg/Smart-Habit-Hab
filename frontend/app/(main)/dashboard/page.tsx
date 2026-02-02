@@ -9,26 +9,11 @@ import TodayHabits from "@/components/dashboard/TodayHabits";
 import WeeklyProgress from "@/components/dashboard/WeeklyProgress";
 import DailyInspiration from "@/components/dashboard/DailyInspiration";
 import ActiveExperiments from "@/components/dashboard/ActiveExperiments";
+import experimentsService from "@/services/ExperimentsService";
 
 const Page = () => {
 
-    const { data: quote, isError: isQuoteError, error: quoteError } = useQuery({
-        queryKey: ['random-quote'],
-        queryFn: async () => {
-            const data = await quoteService.getRandomQuote();
-            return data.data;
-        },
-        staleTime: 60 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
 
-    })
-
-    useEffect(() => {
-        if (isQuoteError && quoteError) {
-            toast.error(quoteError.message);
-        }
-    }, [isQuoteError, quoteError]);
 
     // get endpoints
     const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
@@ -51,7 +36,32 @@ const Page = () => {
         gcTime: 1000 * 60 * 60 * 24,
     })
 
-    // handling errors
+
+    const { data: quote, isError: isQuoteError, error: quoteError } = useQuery({
+        queryKey: ['random-quote'],
+        queryFn: async () => {
+            const data = await quoteService.getRandomQuote();
+            return data.data;
+        },
+        staleTime: 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+
+    })
+
+    const { data: experiments, isError: isExperimentsError, error: experimentsError } = useQuery({
+        queryKey: ['experiments'],
+        queryFn: async () => {
+            const data = await experimentsService.getLatestExperiments();
+            return data.data;
+        },
+        staleTime: 60 * 1000,
+        gcTime: 1000 * 60 * 60 * 24,
+    })
+    /////
+
+
+    ///// handling errors
     useEffect(() => {
         if (isHabitsError && habitsError) {
             toast.error(habitsError.message);
@@ -64,6 +74,19 @@ const Page = () => {
             toast.error(weeklyStatsError.message);
         }
     }, [isWeeklyStatsError, weeklyStatsError]);
+
+    useEffect(() => {
+        if (isQuoteError && quoteError) {
+            toast.error(quoteError.message);
+        }
+    }, [isQuoteError, quoteError]);
+
+    useEffect(() => {
+        if (isExperimentsError && experimentsError) {
+            toast.error(experimentsError.message);
+        }
+    }, [isExperimentsError, experimentsError]);
+    /////
 
     return (
         <div className="flex flex-col gap-6">
@@ -79,9 +102,7 @@ const Page = () => {
                 <DailyInspiration quote={quote || null} />
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
-                <ActiveExperiments />
-            </div>
+            <ActiveExperiments experiments={experiments || []} />
         </div>
     )
 }

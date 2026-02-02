@@ -11,16 +11,17 @@ export type ExperimentStatus =
 export interface IExperiment {
     id: string;
     name: string;
-    habitId: string;
+    habitId?: string;
     habit?: {
         id: string;
         name: string;
     };
-    variable: string;
-    startDate: string;
+    variable?: string;
+    startDate?: string;
     endDate?: string;
     status: ExperimentStatus;
     successRate?: number;
+    duration: number;
 }
 
 export interface IExperimentFormProps {

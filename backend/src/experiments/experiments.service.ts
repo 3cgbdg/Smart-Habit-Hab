@@ -59,6 +59,25 @@ export class ExperimentsService {
     return { data: { data: dataWithSuccessRate, total } };
   }
 
+  async findLatestExperiments(
+    userId: string,
+    limit: number,
+  ): Promise<ReturnDataType<(Experiment & { duration: number })[]>> {
+    const experiments = await this.experimentRepository
+      .createQueryBuilder('experiment')
+      .select([
+        'experiment.id AS id',
+        'experiment.name AS name',
+        `ABS(DATE_PART('day', experiment.startDate::timestamp - CURRENT_DATE::timestamp)) AS duration`,
+      ])
+      .where('experiment.userId = :userId', { userId })
+      .orderBy('experiment.createdAt', 'DESC')
+      .take(limit)
+      .getRawMany();
+
+    return { data: experiments };
+  }
+
   async findOne(
     userId: string,
     id: string,

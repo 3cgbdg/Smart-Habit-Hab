@@ -43,6 +43,14 @@ export class ExperimentsController {
     );
   }
 
+  @Get('latest')
+  async findLatestExperiments(
+    @Req() req: AuthRequest,
+    @Query('limit') limit: number,
+  ): Promise<ReturnDataType<(Experiment & { duration: number })[]>> {
+    return this.experimentsService.findLatestExperiments(req.user.id, limit);
+  }
+
   @Get(':id')
   async findOne(
     @Req() req: AuthRequest,
