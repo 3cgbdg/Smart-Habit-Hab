@@ -15,7 +15,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {

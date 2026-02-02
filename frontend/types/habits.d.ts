@@ -11,7 +11,9 @@ export interface IHabit {
 
 export interface IWeeklyStats {
     day: string,
-    count: number
+    count: number,
+    completed: number,
+    missed: number
 }
 
 interface IHabitFormProps {
