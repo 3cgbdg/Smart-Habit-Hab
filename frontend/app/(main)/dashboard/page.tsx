@@ -29,7 +29,7 @@ const Page = () => {
     const { data: weeklyStats, isError: isWeeklyStatsError, error: weeklyStatsError } = useQuery({
         queryKey: ['weekly-stats'],
         queryFn: async () => {
-            const data = await habitsService.getWeeklyStats();
+            const data = await habitsService.getWeeklyStats(false);
             return data.data;
         },
         staleTime: 60 * 1000,

@@ -13,14 +13,14 @@ import { HabitsService } from './habits.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { ReturnDataType } from 'src/types/common';
-import { IWeeklyStats } from 'src/types/habits';
 import { Habit } from './entities/habit.entity';
 import type { AuthRequest } from 'src/types/auth';
+import { IDayStats } from 'src/types/habits';
 
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
 export class HabitsController {
-  constructor(private readonly habitsService: HabitsService) {}
+  constructor(private readonly habitsService: HabitsService) { }
 
   @Post()
   async create(
@@ -49,8 +49,9 @@ export class HabitsController {
   @Get('stats/weekly')
   async getWeeklyStats(
     @Req() req: AuthRequest,
-  ): Promise<ReturnDataType<IWeeklyStats[]>> {
-    return this.habitsService.getWeeklyStats(req.user.id);
+    @Query("analytics") analytics: boolean,
+  ): Promise<ReturnDataType<IDayStats[]>> {
+    return this.habitsService.getWeeklyStats(req.user.id, analytics);
   }
 
   @Get(':id')

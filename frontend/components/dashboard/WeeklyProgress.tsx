@@ -3,10 +3,10 @@
 import { Card, CardContent, Typography, Box } from "@mui/material"
 import { TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { IWeeklyStats } from "@/types/habits";
+import { IDayStats } from "@/types/habits";
 
 interface WeeklyProgressProps {
-    data: IWeeklyStats[];
+    data: IDayStats[];
 }
 
 const WeeklyProgress = ({ data }: WeeklyProgressProps) => {

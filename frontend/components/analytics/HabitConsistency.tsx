@@ -3,10 +3,10 @@
 import { Card, CardContent, Typography, Box } from "@mui/material"
 import { Activity } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { IWeeklyStats } from "@/types/habits";
+import { IDayStats } from "@/types/habits";
 
 interface HabitConsistencyProps {
-    data: IWeeklyStats[];
+    data: IDayStats[];
 }
 
 const HabitConsistency = ({ data }: HabitConsistencyProps) => {

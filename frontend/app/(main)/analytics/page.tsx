@@ -15,7 +15,7 @@ const AnalyticsPage = () => {
     const { data: weeklyStats, isError: isWeeklyError, error: weeklyError } = useQuery({
         queryKey: ['weekly-stats'],
         queryFn: async () => {
-            const data = await habitsService.getWeeklyStats();
+            const data = await habitsService.getWeeklyStats(true);
             return data.data;
         },
         staleTime: 60 * 1000,
