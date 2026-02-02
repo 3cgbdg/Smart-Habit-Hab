@@ -13,7 +13,13 @@ const Page = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const page = Number(searchParams.get("page")) || 1;
-    const itemsPerPage = 1;
+    const itemsPerPage = 6;
+
+    useEffect(() => {
+        if (!searchParams.get("page")) {
+            router.replace('/habits?page=1');
+        }
+    }, [searchParams, router]);
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
         queryKey: ['all-habits', page],
         queryFn: async () => {
@@ -47,19 +53,20 @@ const Page = () => {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-                {habitsData?.habits?.length === 0 ? (
-                    <Box sx={{ mt: 4, textAlign: 'center', py: 10, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 4, border: '2px dashed rgba(0,0,0,0.1)' }}>
-                        <Typography color="text.secondary">
-                            No habits found. Click the button above to start your first one!
-                        </Typography>
-                    </Box>
-                ) : habitsData?.habits?.map(h => (
+
+            {habitsData?.habits?.length === 0 ? (
+                <Box sx={{ mt: 4, textAlign: 'center', py: 10, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 4, border: '2px dashed rgba(0,0,0,0.1)' }}>
+                    <Typography color="text.secondary">
+                        No habits found. Click the button above to start your first one!
+                    </Typography>
+                </Box>
+            ) : <>     <div className="grid grid-cols-3 gap-4">
+                {habitsData?.habits?.map(h => (
                     <div key={h.id} className="">
                         <HabitCard type='all' habit={h} />
-                    </div>
-                ))}
-            </div>
+                    </div>))}
+            </div></>}
+
 
             {habitsData && habitsData.total > itemsPerPage && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>

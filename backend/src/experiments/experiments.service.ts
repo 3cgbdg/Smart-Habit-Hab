@@ -10,7 +10,7 @@ export class ExperimentsService {
   constructor(
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
-  ) {}
+  ) { }
 
   async createExperiment(
     userId: string,
@@ -26,15 +26,16 @@ export class ExperimentsService {
 
   async findMyExperiments(
     userId: string,
-    offsetPage: number,
-    limit: number,
+    page: number,
+    itemsPerPage: number,
   ): Promise<ReturnDataType<Experiment[]>> {
-    const experiments = await this.experimentRepository.find({
+    const [experiments, total] = await this.experimentRepository.findAndCount({
       where: { userId: userId },
-      skip: (offsetPage - 1) * limit,
-      take: limit,
+      skip: (page - 1) * itemsPerPage,
+      take: itemsPerPage,
+      order: { createdAt: 'DESC' },
     });
-    return { data: experiments };
+    return { data: experiments, total };
   }
 
   async findOne(
