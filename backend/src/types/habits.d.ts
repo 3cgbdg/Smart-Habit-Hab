@@ -3,7 +3,8 @@ export interface IWeeklyStats {
   count: number;
 }
 
-export interface IMonthlyStats {
-  habitId: string;
+export interface ICompletionRate {
+  id: string;
   completionRate: number;
 }
+

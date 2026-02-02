@@ -13,7 +13,7 @@ const Page = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const page = Number(searchParams.get("page")) || 1;
-    const itemsPerPage = 6;
+    const itemsPerPage = 10;
 
     useEffect(() => {
         if (!searchParams.get("page")) {

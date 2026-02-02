@@ -35,7 +35,7 @@ export class ExperimentsController {
     @Req() req: AuthRequest,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
-  ): Promise<ReturnDataType<Experiment[]>> {
+  ): Promise<ReturnDataType<{ data: Experiment[], total: number }>> {
     return this.experimentsService.findMyExperiments(
       req.user.id,
       page,
