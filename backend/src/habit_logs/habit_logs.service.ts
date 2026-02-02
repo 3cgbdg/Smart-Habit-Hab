@@ -15,7 +15,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -154,5 +154,21 @@ export class HabitLogsService {
       status: Status.SKIPPED,
     });
     return true;
+  }
+
+  async getSuccessRate(habitId: string, startDate: string, endDate: string): Promise<number> {
+    const logs = await this.habitLogRepository.find({
+      where: {
+        habitId,
+        date: Between(startDate, endDate),
+      },
+    });
+
+    if (logs.length === 0) return 0;
+
+    const completedCount = logs.filter(
+      (log) => log.status === Status.COMPLETED,
+    ).length;
+    return Math.round((completedCount / logs.length) * 100);
   }
 }

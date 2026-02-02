@@ -5,4 +5,5 @@ export interface IReturnMessage {
 export type ReturnDataType<T> = {
   message?: string;
   data: T;
+  total?: number;
 };

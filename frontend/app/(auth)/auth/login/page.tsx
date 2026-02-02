@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import authService from '@/services/AuthService';
 import { toast } from 'react-toastify';
-import { useAppDispatch } from '@/hooks/reduxHooks';
 import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 

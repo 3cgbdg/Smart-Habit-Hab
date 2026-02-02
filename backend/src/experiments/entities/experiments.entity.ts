@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
 import { User } from 'src/users/entities/user.entity';
-import { ExperimentResult } from './experiment_results.entity';
 
 export enum ExperimentStatus {
   PLANNED = 'planned',
@@ -27,7 +26,7 @@ export class Experiment {
   user: User;
 
   @Column({ type: 'uuid' })
-  user_id: string;
+  userId: string;
 
   @ManyToOne(() => Habit, (habit) => habit.experiments, {
     onDelete: 'CASCADE',
@@ -55,10 +54,7 @@ export class Experiment {
     default: ExperimentStatus.PLANNED,
   })
   status: ExperimentStatus;
-
-  @OneToMany(() => ExperimentResult, (result) => result.experiment)
-  results: ExperimentResult[];
-
+  
   @CreateDateColumn()
   createdAt: Date;
 }

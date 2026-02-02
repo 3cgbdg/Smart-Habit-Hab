@@ -47,7 +47,17 @@ const HabitCard = ({ habit, type }: { habit: IHabit, type: 'relevant' | 'all' })
     return (
         <Card
             elevation={3}
-            sx={{ p: 1, width: "100%", borderRadius: 3 }}
+            sx={{
+                p: 1,
+                width: "100%",
+                borderRadius: 3,
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                    cursor: "pointer"
+                }
+            }}
         >
             <CardContent className="flex flex-col min-h-[140px]">
                 <div className="flex flex-col gap-2">
