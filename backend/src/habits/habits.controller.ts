@@ -20,7 +20,7 @@ import type { AuthRequest } from 'src/types/auth';
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
 export class HabitsController {
-  constructor(private readonly habitsService: HabitsService) { }
+  constructor(private readonly habitsService: HabitsService) {}
 
   @Post()
   async create(

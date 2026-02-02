@@ -27,7 +27,7 @@ export class Experiment {
   user: User;
 
   @Column({ type: 'uuid' })
-  user_id: string;
+  userId: string;
 
   @ManyToOne(() => Habit, (habit) => habit.experiments, {
     onDelete: 'CASCADE',

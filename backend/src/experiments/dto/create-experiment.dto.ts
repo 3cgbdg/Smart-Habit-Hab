@@ -5,25 +5,29 @@ import {
   IsOptional,
   IsDateString,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateExperimentDto {
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsUUID()
   @IsNotEmpty()
+  @IsUUID()
   habitId: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   variable: string;
 
-  @IsDateString()
   @IsNotEmpty()
+  @IsDateString()
   startDate: string;
 
-  @IsDateString()
   @IsOptional()
+  @IsDateString()
+  @Transform(({ value }: { value: string | null | undefined }) => {
+    return value === '' ? null : value;
+  })
   endDate?: string;
 }

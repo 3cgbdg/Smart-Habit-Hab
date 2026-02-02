@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Experiment } from './entities/experiments.entity';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
+import { IReturnMessage, ReturnDataType } from 'src/types/common';
 
 @Injectable()
 export class ExperimentsService {
@@ -11,38 +12,57 @@ export class ExperimentsService {
     private readonly experimentRepository: Repository<Experiment>,
   ) {}
 
-  async create(userId: string, dto: CreateExperimentDto) {
+  async createExperiment(
+    userId: string,
+    dto: CreateExperimentDto,
+  ): Promise<IReturnMessage> {
     const experiment = this.experimentRepository.create({
       ...dto,
-      user_id: userId,
+      userId: userId,
     });
-    return await this.experimentRepository.save(experiment);
+    await this.experimentRepository.save(experiment);
+    return { message: 'Successfully created experiment' };
   }
 
-  async findAll(userId: string) {
-    return await this.experimentRepository.find({
-      where: { user_id: userId },
-      relations: ['habit'],
+  async findMyExperiments(
+    userId: string,
+    offsetPage: number,
+    limit: number,
+  ): Promise<ReturnDataType<Experiment[]>> {
+    const experiments = await this.experimentRepository.find({
+      where: { userId: userId },
+      skip: (offsetPage - 1) * limit,
+      take: limit,
     });
+    return { data: experiments };
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(
+    userId: string,
+    id: string,
+  ): Promise<ReturnDataType<Experiment>> {
     const experiment = await this.experimentRepository.findOne({
-      where: { id, user_id: userId },
-      relations: ['habit'],
+      where: { id, userId: userId },
     });
     if (!experiment) throw new NotFoundException('Experiment not found');
-    return experiment;
+    return { data: experiment };
   }
 
-  async update(userId: string, id: string, dto: CreateExperimentDto) {
+  async update(
+    userId: string,
+    id: string,
+    dto: CreateExperimentDto,
+  ): Promise<IReturnMessage> {
     const experiment = await this.findOne(userId, id);
-    Object.assign(experiment, dto);
-    return await this.experimentRepository.save(experiment);
+    // combining our experminent with dto data we want to update
+    Object.assign(experiment.data, dto);
+    await this.experimentRepository.save(experiment.data);
+    return { message: 'Successfully updated experiment' };
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<IReturnMessage> {
     const experiment = await this.findOne(userId, id);
-    return await this.experimentRepository.remove(experiment);
+    await this.experimentRepository.remove(experiment.data);
+    return { message: 'Successfully deleted experiment' };
   }
 }
