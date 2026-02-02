@@ -10,4 +10,4 @@ import { HabitLogsModule } from 'src/habit_logs/habit_logs.module';
   controllers: [ExperimentsController],
   providers: [ExperimentsService],
 })
-export class ExperimentsModule { }
+export class ExperimentsModule {}

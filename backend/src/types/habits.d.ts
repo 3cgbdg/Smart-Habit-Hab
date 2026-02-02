@@ -7,4 +7,3 @@ export interface ICompletionRate {
   id: string;
   completionRate: number;
 }
-

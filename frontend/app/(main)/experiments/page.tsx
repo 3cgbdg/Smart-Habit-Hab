@@ -14,7 +14,6 @@ import { Pagination } from "@mui/material";
 
 const Page = () => {
     const [open, setOpen] = useState(false);
-    const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -22,7 +21,6 @@ const Page = () => {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        setMounted(true);
         if (!searchParams.get("page")) {
             router.replace('/experiments?page=1');
         }
@@ -36,8 +34,7 @@ const Page = () => {
         queryFn: async () => {
             const response = await experimentsService.getMyExperiments(page, itemsPerPage);
             return response.data;
-        },
-        enabled: mounted
+        }
     });
 
     useEffect(() => {
@@ -51,8 +48,6 @@ const Page = () => {
     };
 
     const totalPages = useMemo(() => (experimentsData ? Math.ceil(experimentsData.total / itemsPerPage) : 0), [experimentsData]);
-
-    if (!mounted) return null;
 
     return (
         <Box sx={{ p: 1 }}>

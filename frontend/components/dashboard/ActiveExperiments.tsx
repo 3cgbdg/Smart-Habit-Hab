@@ -28,7 +28,7 @@ const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
                 <div className="flex items-center gap-2">
                     <FlaskConical className="w-5 h-5 text-blue" />
                     <Typography variant="h6" className="font-bold text-gray-800 text-lg">
-                        Active Experiments
+                        Latest Experiments
                     </Typography>
                 </div>
                 <Link href="/experiments" className="link text-xs flex items-center gap-1 group">

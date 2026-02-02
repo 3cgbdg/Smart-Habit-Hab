@@ -68,14 +68,14 @@ export class ExperimentsService {
       .select([
         'experiment.id AS id',
         'experiment.name AS name',
-        `ABS(DATE_PART('day', experiment.startDate::timestamp - CURRENT_DATE::timestamp)) AS duration`,
+        `ABS(DATE_PART('day', "experiment"."startDate"::timestamp - CURRENT_DATE::timestamp)) AS duration`,
       ])
       .where('experiment.userId = :userId', { userId })
       .orderBy('experiment.createdAt', 'DESC')
       .take(limit)
-      .getRawMany();
+      .getRawMany<{ id: string; name: string; duration: number }>();
 
-    return { data: experiments };
+    return { data: experiments as (Experiment & { duration: number })[] };
   }
 
   async findOne(
