@@ -11,7 +11,6 @@ const ActiveExperiments = () => {
                 </Typography>
 
                 <div className="space-y-4">
-                    {/* Morning Routine - Placeholder for now until experiments are fully integrated */}
                     <div className="border-l-4 border-blue-500 pl-4 py-2">
                         <div className="flex items-start justify-between mb-2">
                             <Typography variant="subtitle1" className="font-medium text-gray-800">

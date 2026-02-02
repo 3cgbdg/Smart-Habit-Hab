@@ -4,18 +4,23 @@ import { ExperimentFormData } from "@/validation/ExperimentFormSchema";
 import { IExperiment } from "@/types/experiments";
 
 class ExperimentsService {
-    async createExperiment(data: ExperimentFormData): Promise<ApiResponse<IExperiment>> {
+    async createExperiment(data: ExperimentFormData): Promise<ApiResponse<null>> {
         const res = await api.post("/experiments", data);
         return res.data;
     }
 
-    async updateExperiment(id: string, data: ExperimentFormData): Promise<ApiResponse<IExperiment>> {
+    async updateExperiment(id: string, data: ExperimentFormData): Promise<ApiResponse<null>> {
         const res = await api.patch(`/experiments/${id}`, data);
         return res.data;
     }
 
-    async getMyExperiments(): Promise<ApiResponse<IExperiment[]>> {
-        const res = await api.get("/experiments");
+    async getMyExperiments(page: number, itemsPerPage: number): Promise<ApiResponse<IExperiment[]>> {
+        const res = await api.get("/experiments", {
+            params: {
+                page,
+                itemsPerPage
+            }
+        });
         return res.data;
     }
 

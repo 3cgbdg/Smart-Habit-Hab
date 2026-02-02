@@ -66,7 +66,11 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
     });
 
     const onSubmit = (data: ExperimentFormData) => {
-        mutation.mutate(data);
+        const payload = {
+            ...data,
+            endDate: data.endDate || null,
+        };
+        mutation.mutate(payload as ExperimentFormData);
     };
 
     return (

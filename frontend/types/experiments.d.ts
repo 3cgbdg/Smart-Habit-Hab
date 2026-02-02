@@ -1,5 +1,3 @@
-import { IHabit } from "./habits.d";
-
 export enum ExperimentStatus {
     PLANNED = 'planned',
     RUNNING = 'running',
@@ -21,3 +19,4 @@ export interface IExperimentFormProps {
     initialData?: IExperiment;
     onSuccess: () => void;
 }
+
