@@ -20,7 +20,7 @@ import { ReturnDataType, IReturnMessage } from 'src/types/common';
 @Controller('experiments')
 @UseGuards(AuthGuard('jwt'))
 export class ExperimentsController {
-  constructor(private readonly experimentsService: ExperimentsService) { }
+  constructor(private readonly experimentsService: ExperimentsService) {}
 
   @Post()
   async createExperiment(
@@ -35,12 +35,20 @@ export class ExperimentsController {
     @Req() req: AuthRequest,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
-  ): Promise<ReturnDataType<{ data: Experiment[], total: number }>> {
+  ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
     return this.experimentsService.findMyExperiments(
       req.user.id,
       page,
       itemsPerPage,
     );
+  }
+
+  @Get('latest')
+  async findLatestExperiments(
+    @Req() req: AuthRequest,
+    @Query('limit') limit: number,
+  ): Promise<ReturnDataType<(Experiment & { duration: number })[]>> {
+    return this.experimentsService.findLatestExperiments(req.user.id, limit);
   }
 
   @Get(':id')

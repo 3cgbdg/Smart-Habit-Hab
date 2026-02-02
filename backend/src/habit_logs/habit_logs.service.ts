@@ -15,7 +15,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) { }
+  ) {}
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -156,7 +156,11 @@ export class HabitLogsService {
     return true;
   }
 
-  async getSuccessRate(habitId: string, startDate: string, endDate: string): Promise<number> {
+  async getSuccessRate(
+    habitId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<number> {
     const logs = await this.habitLogRepository.find({
       where: {
         habitId,

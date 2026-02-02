@@ -28,6 +28,15 @@ class ExperimentsService {
         const res = await api.delete(`/experiments/${id}`);
         return res.data;
     }
+
+    async getLatestExperiments(): Promise<ApiResponse<IExperiment[]>> {
+        const res = await api.get("/experiments/latest", {
+            params: {
+                limit: 3
+            }
+        });
+        return res.data;
+    }
 }
 
 const experimentsService = new ExperimentsService();

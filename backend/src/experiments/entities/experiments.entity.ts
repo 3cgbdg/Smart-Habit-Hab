@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToMany,
   CreateDateColumn,
 } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
@@ -54,7 +53,7 @@ export class Experiment {
     default: ExperimentStatus.PLANNED,
   })
   status: ExperimentStatus;
-  
+
   @CreateDateColumn()
   createdAt: Date;
 }
