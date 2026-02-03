@@ -28,8 +28,8 @@ const initialState: IinitialState = {
   error: null,
 };
 
-const authSlice = createSlice({
-  name: "auth",
+const profileSlice = createSlice({
+  name: "profile",
   initialState,
   reducers: {
     getProfile: (state, action: PayloadAction<IUser>) => {
@@ -64,5 +64,5 @@ const authSlice = createSlice({
 export const {
   getProfile,
   logOut
-} = authSlice.actions;
-export default authSlice.reducer;
+} = profileSlice.actions;
+export default profileSlice.reducer;
