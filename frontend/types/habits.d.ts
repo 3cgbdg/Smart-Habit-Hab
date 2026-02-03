@@ -13,8 +13,11 @@ export interface IHabit {
 export interface IDayStats {
     date: string;
     count: number;
-    completed: number;
-    missed: number;
+}
+
+export interface IWeekStats {
+    completed: IDayStats[];
+    missed?: IDayStats[];
 }
 
 interface IHabitFormProps {

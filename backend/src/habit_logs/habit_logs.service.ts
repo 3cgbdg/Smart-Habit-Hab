@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
 import { Between, Repository } from 'typeorm';
-import { IDayStats } from 'src/types/habits';
+import { IWeekStats } from 'src/types/habits';
 
 interface IHabitMonthlyRawStats {
   habitId: string;
@@ -75,7 +75,7 @@ export class HabitLogsService {
   }
 
   // weekly stats for multiple habits
-  async getWeeklyStats(userId: string, analytics: boolean): Promise<IDayStats[]> {
+  async getWeeklyStats(userId: string, analytics: boolean): Promise<IWeekStats> {
     const today = new Date();
     // Get stats for the last 7 days
     const sevenDaysAgo = new Date();
@@ -114,14 +114,16 @@ export class HabitLogsService {
 
     // map raw stats to a lookup object
     const statsLookup = statsRaw.reduce((acc, row) => {
-      acc[row.date] = {
+      acc[row.date.toISOString().split('T')[0]] = {
         completed: parseInt(row.completedCount) || 0,
         missed: analytics ? (parseInt(row.missedCount) || 0) : 0,
       };
       return acc;
     }, {});
-
-    const result: any[] = [];
+    const result: IWeekStats = {
+      completed: [],
+      missed: analytics ? [] : undefined,
+    };
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(sevenDaysAgo);
@@ -129,12 +131,17 @@ export class HabitLogsService {
       const dateStr = date.toISOString().split('T')[0];
       const stats = statsLookup[dateStr] || { completed: 0, missed: 0 };
 
-      result.push({
+      result.completed.push({
         date: dateStr,
         count: stats.completed,
-        completed: stats.completed,
-        missed: analytics ? stats.missed : null,
       });
+
+      if (analytics && result.missed) {
+        result.missed.push({
+          date: dateStr,
+          count: stats.missed,
+        });
+      }
     }
 
     return result;

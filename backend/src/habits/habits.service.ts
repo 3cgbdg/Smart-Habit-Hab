@@ -5,7 +5,7 @@ import { MoreThan, Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
-import { IDayStats } from 'src/types/habits';
+import { IWeekStats } from 'src/types/habits';
 import { Status } from 'src/habit_logs/entities/habit_log.enitity';
 
 @Injectable()
@@ -33,6 +33,8 @@ export class HabitsService {
         userId: string,
         page: number,
         itemsPerPage: number,
+        sortBy: string,
+        order: "ASC" | "DESC" | undefined,
     ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
         const qb = this.habitRepository
             .createQueryBuilder('habit')
@@ -41,7 +43,7 @@ export class HabitsService {
         const total = await qb.getCount();
 
         const habits = await qb
-            .orderBy('habit.createdAt', 'DESC')
+            .orderBy(`habit.${sortBy}`, order)
             .skip((page - 1) * itemsPerPage)
             .take(itemsPerPage)
             .getMany();
@@ -92,7 +94,7 @@ export class HabitsService {
     async getWeeklyStats(
         userId: string,
         analytics: boolean,
-    ): Promise<ReturnDataType<IDayStats[]>> {
+    ): Promise<ReturnDataType<IWeekStats>> {
 
 
         const stats = await this.habitLogsService.getWeeklyStats(userId, analytics);

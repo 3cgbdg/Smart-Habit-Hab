@@ -3,13 +3,29 @@
 import { Card, CardContent, Typography, Box } from "@mui/material"
 import { Activity } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { IDayStats } from "@/types/habits";
+import { useMemo } from "react";
+import { IWeekStats } from "@/types/habits";
 
 interface HabitConsistencyProps {
-    data: IDayStats[];
+    data: IWeekStats;
 }
 
 const HabitConsistency = ({ data }: HabitConsistencyProps) => {
+
+    // memo for caching data with formatted dates
+    const chartData = useMemo(() => {
+        if (!data || !data.completed) return [];
+        return data.completed.map((item, index) => {
+            const date = new Date(item.date);
+            return {
+                day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                completed: item.count,
+                missed: data.missed ? data.missed[index]?.count : 0,
+                fullDate: item.date
+            };
+        });
+    }, [data]);
+
     return (
         <Card className="shadow-xs border border-neutral-200 overflow-hidden col-span-2">
             <Box className="p-4 bg-lightBlue/10 border-b border-neutral-200 flex items-center gap-2">
@@ -24,7 +40,7 @@ const HabitConsistency = ({ data }: HabitConsistencyProps) => {
                 </Typography>
                 <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={data || []}>
+                        <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                             <XAxis
                                 dataKey="day"

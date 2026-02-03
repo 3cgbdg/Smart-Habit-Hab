@@ -15,7 +15,7 @@ import { CreateHabitDto } from './dto/create-habit.dto';
 import { ReturnDataType } from 'src/types/common';
 import { Habit } from './entities/habit.entity';
 import type { AuthRequest } from 'src/types/auth';
-import { IDayStats } from 'src/types/habits';
+import { IWeekStats } from 'src/types/habits';
 
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
@@ -35,8 +35,10 @@ export class HabitsController {
     @Req() req: AuthRequest,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
+    @Query('sortBy') sortBy: string,
+    @Query('order') order: "ASC" | "DESC" | undefined,
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
-    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage);
+    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
   }
 
   @Get('relevant')
@@ -50,7 +52,7 @@ export class HabitsController {
   async getWeeklyStats(
     @Req() req: AuthRequest,
     @Query("analytics") analytics: boolean,
-  ): Promise<ReturnDataType<IDayStats[]>> {
+  ): Promise<ReturnDataType<IWeekStats>> {
     return this.habitsService.getWeeklyStats(req.user.id, analytics);
   }
 

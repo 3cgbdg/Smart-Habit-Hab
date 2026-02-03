@@ -3,13 +3,14 @@
 import { Card, CardContent, Typography, Box } from "@mui/material"
 import { TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { IDayStats } from "@/types/habits";
+import { IWeekStats } from "@/types/habits";
 
 interface WeeklyProgressProps {
-    data: IDayStats[];
+    data: IWeekStats;
 }
 
 const WeeklyProgress = ({ data }: WeeklyProgressProps) => {
+
     return (
         <Card className="shadow-xs border border-neutral-200 overflow-hidden col-span-3">
             <Box className="p-4 bg-lightBlue/50 border-b border-neutral-200 flex items-center gap-2">
@@ -24,10 +25,10 @@ const WeeklyProgress = ({ data }: WeeklyProgressProps) => {
                         Habit Completion Trends
                     </Typography>
                     <ResponsiveContainer width="100%" height={220}>
-                        <LineChart data={data || []}>
+                        <LineChart data={data.completed || []}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                             <XAxis
-                                dataKey="day"
+                                dataKey="date"
                                 tick={{ fontSize: 12, fill: '#94a3b8' }}
                                 axisLine={false}
                                 tickLine={false}

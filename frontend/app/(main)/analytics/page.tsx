@@ -11,22 +11,23 @@ import TopHabits from "@/components/analytics/TopHabits";
 import ExperimentImpact from "@/components/analytics/ExperimentImpact";
 
 const AnalyticsPage = () => {
-    // 1. Weekly Stats for Consistency Chart
+
+
     const { data: weeklyStats, isError: isWeeklyError, error: weeklyError } = useQuery({
-        queryKey: ['weekly-stats'],
+        queryKey: ['weekly-stats-analytics'],
         queryFn: async () => {
             const data = await habitsService.getWeeklyStats(true);
+            console.log(data)
             return data.data;
         },
         staleTime: 60 * 1000,
     });
 
-    // 2. Top Habits (Using my habits and sorting by completion rate)
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
         queryKey: ['all-habits-analytics'],
         queryFn: async () => {
-            // Fetch first 10 habits and we'll take top ones
-            const data = await habitsService.getMyHabits(1, 10);
+            // fetching first 10 habits and we'll take top ones
+            const data = await habitsService.getMyHabits(1, 10, 'completed', 'DESC');
             return data?.data?.habits || [];
         },
         staleTime: 60 * 1000,
@@ -85,7 +86,7 @@ const AnalyticsPage = () => {
             {/* Top Row: Consistency & Insights */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
-                    <HabitConsistency data={weeklyStats || []} />
+                    <HabitConsistency data={weeklyStats || { completed: [], missed: [] }} />
                 </div>
                 <div className="lg:col-span-1">
                     <KeyInsights insights={insightMessage} />
