@@ -1,17 +1,22 @@
 import { Box, Card, Typography, Divider } from "@mui/material";
-import { Target, Beaker, Calendar } from "lucide-react";
+import { Target, Beaker, Calendar, Circle } from "lucide-react";
 import type { IExperiment } from "@/types/experiments";
+import { ExperimentUtils } from "@/utils/experiment";
 
 interface ExperimentDetailInfoProps {
     experiment: IExperiment;
 }
 
 const ExperimentDetailInfo = ({ experiment }: ExperimentDetailInfoProps) => {
+
+
+    const statusProps = ExperimentUtils.getStatusStyles(experiment.status || 'planned');
+
     return (
         <Card
             elevation={3}
             sx={{
-                borderRadius: 4,
+                borderRadius: 2,
                 overflow: 'hidden',
                 border: '1px solid',
                 borderColor: 'divider',
@@ -72,9 +77,21 @@ const ExperimentDetailInfo = ({ experiment }: ExperimentDetailInfoProps) => {
                         <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 1.5 }}>
                             Status
                         </Typography>
-                        <Box sx={{ display: 'inline-block', px: 2, py: 0.5, bgcolor: 'primary.main', borderRadius: 10, color: 'white' }}>
-                            <Typography variant="caption" fontWeight={700} sx={{ textTransform: 'uppercase' }}>
-                                {experiment.status}
+                        <Box
+                            sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                px: 1.5,
+                                py: 0.5,
+                                borderRadius: 10,
+                                bgcolor: statusProps.bg,
+                                color: statusProps.color,
+                            }}
+                        >
+                            <Circle size={8} fill="currentColor" />
+                            <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase' }}>
+                                {statusProps.label}
                             </Typography>
                         </Box>
                     </Box>

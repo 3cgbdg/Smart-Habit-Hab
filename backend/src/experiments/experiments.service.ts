@@ -13,7 +13,7 @@ export class ExperimentsService {
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
     private readonly habitLogsService: HabitLogsService,
-  ) { }
+  ) {}
 
   async createExperiment(
     userId: string,
@@ -93,7 +93,8 @@ export class ExperimentsService {
     userId: string,
     id: string,
   ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
-    const experiment = await this.experimentRepository.createQueryBuilder('experiment')
+    const experiment = await this.experimentRepository
+      .createQueryBuilder('experiment')
       .innerJoinAndSelect('experiment.habit', 'habit')
       .select([
         'experiment.id',
@@ -123,9 +124,9 @@ export class ExperimentsService {
 
     return {
       data: {
-        ...(experiment as any),
+        ...experiment,
         successRate,
-      },
+      } as Experiment & { successRate: number },
     };
   }
 

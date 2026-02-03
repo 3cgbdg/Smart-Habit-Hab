@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -15,6 +16,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import experimentsService from "@/services/ExperimentsService";
 import habitsService from "@/services/HabitsService";
+import { IHabit } from "@/types/habits";
 import { toast } from "react-toastify";
 import { experimentSchema, ExperimentFormData } from "@/validation/ExperimentFormSchema";
 import { IExperimentFormProps } from "@/types/experiments";
@@ -28,23 +30,49 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
         queryFn: () => habitsService.getMyHabits(1, 100),
     });
 
-    const habits = habitsData?.data?.habits || [];
+    const habits = useMemo(() => {
+        const data = habitsData?.data;
+        const baseHabits = Array.isArray(data)
+            ? data
+            : (data as unknown as { habits: IHabit[] })?.habits || [];
+
+        // If we have initialData with a habit that's not in the fetched list, add it
+        const currentHabitId = initialData?.habitId || initialData?.habit?.id;
+        if (initialData?.habit && currentHabitId && !baseHabits.find((h: IHabit) => h.id === currentHabitId)) {
+            return [initialData.habit, ...baseHabits];
+        }
+        return baseHabits;
+    }, [habitsData, initialData]);
 
     const {
         register,
         handleSubmit,
         control,
+        reset,
         formState: { errors },
     } = useForm<ExperimentFormData>({
         resolver: zodResolver(experimentSchema),
         defaultValues: {
             name: initialData?.name || "",
-            habitId: initialData?.habitId || "",
+            habitId: initialData?.habitId || initialData?.habit?.id || "",
             variable: initialData?.variable || "",
             startDate: initialData?.startDate || new Date().toISOString().split('T')[0],
             endDate: initialData?.endDate || "",
         },
     });
+
+    // Reset form when initialData changes (useful for modals)
+    useEffect(() => {
+        if (initialData) {
+            reset({
+                name: initialData.name,
+                habitId: initialData.habitId || initialData.habit?.id || "",
+                variable: initialData.variable,
+                startDate: initialData.startDate,
+                endDate: initialData.endDate || "",
+            });
+        }
+    }, [initialData, reset]);
 
     const mutation = useMutation({
         mutationFn: async (data: ExperimentFormData) => {
@@ -58,6 +86,7 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
             toast.success(res.message);
             queryClient.invalidateQueries({ queryKey: ['all-experiments'] });
             queryClient.invalidateQueries({ queryKey: ['experiments-analytics'] });
+            queryClient.invalidateQueries({ queryKey: ['experiment', initialData?.id] });
             onSuccess();
         },
         onError: (error: unknown) => {
@@ -73,6 +102,7 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
         };
         mutation.mutate(payload as ExperimentFormData);
     };
+
 
     return (
         <Box
@@ -106,7 +136,7 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
                             {...field}
                             disabled={isLoadingHabits}
                         >
-                            {habits.map((habit) => (
+                            {habits.map((habit: IHabit) => (
                                 <MenuItem key={habit.id} value={habit.id}>
                                     {habit.name}
                                 </MenuItem>

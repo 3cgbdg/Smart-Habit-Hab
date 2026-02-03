@@ -1,5 +1,7 @@
-import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
+import { ExperimentUtils } from "@/utils/experiment";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import { TrendingUp, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface ExperimentDetailStatsProps {
     successRate: number;
@@ -7,24 +9,35 @@ interface ExperimentDetailStatsProps {
 }
 
 const ExperimentDetailStats = ({ successRate, startDate }: ExperimentDetailStatsProps) => {
-    const theme = useTheme();
+    const [daysRunning, setDaysRunning] = useState<number>(0);
 
-    const daysRunning = Math.floor(
-        (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
+    useEffect(() => {
+        if (startDate) {
+            const handle = requestAnimationFrame(() => {
+                setDaysRunning(ExperimentUtils.getDaysRunning(startDate));
+            });
+            return () => cancelAnimationFrame(handle);
+        }
+    }, [startDate]);
 
     return (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 4 }}>
-            <Card elevation={0} sx={{ bgcolor: 'rgba(76, 175, 80, 0.05)', border: '1px solid rgba(76, 175, 80, 0.1)', borderRadius: 4 }}>
+            <Card
+                elevation={3}
+                sx={{
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    border: '1px solid',
+                    borderColor: 'divider'
+                }}
+            >
+                <Box sx={{ p: 2, bgcolor: 'var(--color-lightBlue)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <TrendingUp className="w-5 h-5 text-blue" />
+                    <Typography variant="h6" className="font-bold text-gray-800 text-lg">
+                        Success Rate
+                    </Typography>
+                </Box>
                 <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                        <Box sx={{ p: 1, bgcolor: 'success.main', borderRadius: 2, color: 'white' }}>
-                            <TrendingUp size={24} />
-                        </Box>
-                        <Typography variant="subtitle1" fontWeight={600} color="success.main">
-                            Success Rate
-                        </Typography>
-                    </Box>
                     <Typography variant="h3" fontWeight={800} color="text.primary">
                         {successRate}%
                     </Typography>
@@ -34,16 +47,22 @@ const ExperimentDetailStats = ({ successRate, startDate }: ExperimentDetailStats
                 </CardContent>
             </Card>
 
-            <Card elevation={0} sx={{ bgcolor: 'rgba(33, 150, 243, 0.05)', border: '1px solid rgba(33, 150, 243, 0.1)', borderRadius: 4 }}>
+            <Card
+                elevation={3}
+                sx={{
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    border: '1px solid',
+                    borderColor: 'divider'
+                }}
+            >
+                <Box sx={{ p: 2, bgcolor: 'var(--color-lightBlue)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Clock className="w-5 h-5 text-blue" />
+                    <Typography variant="h6" className="font-bold text-gray-800 text-lg">
+                        Duration
+                    </Typography>
+                </Box>
                 <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                        <Box sx={{ p: 1, bgcolor: 'primary.main', borderRadius: 2, color: 'white' }}>
-                            <Clock size={24} />
-                        </Box>
-                        <Typography variant="subtitle1" fontWeight={600} color="primary.main">
-                            Duration
-                        </Typography>
-                    </Box>
                     <Typography variant="h3" fontWeight={800} color="text.primary">
                         {daysRunning < 0 ? 0 : daysRunning} <Typography component="span" variant="h5" fontWeight={600}>days</Typography>
                     </Typography>

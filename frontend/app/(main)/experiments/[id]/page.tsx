@@ -14,7 +14,7 @@ import {
     DialogContent
 } from "@mui/material";
 import { ArrowLeft, Edit2, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ExperimentForm from "@/components/experiments/ExperimentForm";
 import ExperimentDetailStats from "@/components/experiments/ExperimentDetailStats";
 import ExperimentDetailInfo from "@/components/experiments/ExperimentDetailInfo";
@@ -24,14 +24,22 @@ const ExperimentDetailsPage = () => {
     const router = useRouter();
     const id = params.id as string;
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
 
-    const { data: experimentRes, isLoading, refetch } = useQuery({
+    useEffect(() => {
+        const handle = requestAnimationFrame(() => {
+            setIsHydrated(true);
+        });
+        return () => cancelAnimationFrame(handle);
+    }, []);
+
+    const { data: experiment, isLoading, refetch } = useQuery({
         queryKey: ['experiment', id],
-        queryFn: () => experimentsService.getExperimentById(id),
+        queryFn: async () => { const res = await experimentsService.getExperimentById(id); return res.data; },
         enabled: !!id,
     });
 
-    const experiment = experimentRes?.data;
+    if (!isHydrated) return null;
 
     if (isLoading) {
         return (
@@ -53,13 +61,13 @@ const ExperimentDetailsPage = () => {
     }
 
     return (
-        <Box sx={{ maxWidth: 900, mx: 'auto', p: 1 }}>
+        <Box sx={{ maxWidth: 896, mx: 'auto', p: 1, pb: 10 }}>
             {/* Header / Nav */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 6 }}>
                 <Button
                     startIcon={<ArrowLeft size={20} />}
                     onClick={() => router.push('/experiments')}
-                    sx={{ color: 'text.secondary', fontWeight: 600 }}
+                    sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}
                 >
                     Back to Experiments
                 </Button>
@@ -68,15 +76,15 @@ const ExperimentDetailsPage = () => {
                     variant="contained"
                     startIcon={<Edit2 size={18} />}
                     onClick={() => setIsEditOpen(true)}
-                    sx={{ borderRadius: 10, fontWeight: 600 }}
+                    sx={{ borderRadius: 10, fontWeight: 600, textTransform: 'none', px: 3 }}
                 >
                     Edit Experiment
                 </Button>
             </Box>
 
-            <Box sx={{ mb: 6 }}>
+            <Box sx={{ mb: 8 }}>
                 <h1 className="page-title">{experiment.name}</h1>
-                <Typography color="text.secondary" sx={{ mt: 1 }}>
+                <Typography variant="body1" sx={{ color: 'var(--color-gray)', mt: 1.5, fontSize: '1.1rem' }}>
                     Tracking the impact of <strong>{experiment.variable}</strong> on <strong>{experiment.habit?.name}</strong>.
                 </Typography>
             </Box>

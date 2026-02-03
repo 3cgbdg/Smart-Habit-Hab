@@ -24,5 +24,11 @@ export const ExperimentUtils = {
                     label: 'Planned'
                 };
         }
+    },
+
+    getDaysRunning(startDate: string) {
+        return Math.floor(
+            (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+        );
     }
 }
