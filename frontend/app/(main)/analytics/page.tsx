@@ -25,19 +25,15 @@ const AnalyticsPage = () => {
 
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
         queryKey: ['all-habits-analytics'],
-        queryFn: async () => {
-            // fetching first 10 habits and we'll take top ones
-            const data = await habitsService.getMyHabits(1, 10, 'completed', 'DESC');
-            return data?.data?.habits || [];
-        },
+        queryFn: async () => { const res = await habitsService.getMyHabits(1, 4, 'streak', 'DESC'); return res.data; },
         staleTime: 60 * 1000,
     });
 
-    // 3. Experiments for Impact Chart
+
     const { data: experimentsData, isError: isExpError, error: expError } = useQuery({
         queryKey: ['experiments-analytics'],
         queryFn: async () => {
-            const data = await experimentsService.getMyExperiments(1, 5);
+            const data = await experimentsService.getMyExperiments(1, 4, true);
             return data?.data?.data || [];
         },
         staleTime: 60 * 1000,
@@ -50,28 +46,16 @@ const AnalyticsPage = () => {
         if (isExpError && expError) toast.error(expError.message);
     }, [isWeeklyError, weeklyError, isHabitsError, habitsError, isExpError, expError]);
 
-    // Data processing
-    const topHabits = useMemo(() => {
-        if (!habitsData) return [];
-        return [...habitsData]
-            .sort((a, b) => (b.completionRate || 0) - (a.completionRate || 0))
-            .slice(0, 4);
-    }, [habitsData]);
 
-    const experimentsWithBoost = useMemo(() => {
-        if (!experimentsData) return [];
-        return experimentsData.map(exp => ({
-            ...exp,
-            // Mock consistency boost if not provided by API yet
-            consistencyBoost: Math.floor(Math.random() * 15) + 5
-        }));
-    }, [experimentsData]);
 
+
+
+    // memoing the insight message with logic of text definition
     const insightMessage = useMemo(() => {
-        if (!habitsData || habitsData.length === 0) return "";
-        const avgRate = habitsData.reduce((acc, h) => acc + (h.completionRate || 0), 0) / habitsData.length;
+        if (!habitsData || habitsData.habits.length === 0) return "";
+        const avgRate = habitsData.habits.reduce((acc, h) => acc + (h.completionRate || 0), 0) / habitsData.habits.length;
         if (avgRate > 80) return "Impressive! Your average habit completion rate is over 80%. You're maintaining excellent consistency.";
-        if (avgRate > 50) return "You're on the right track! Keeping your habits above 50% helps build long-term momentum.";
+        if (avgRate >= 50) return "You're on the right track! Keeping your habits above 50% helps build long-term momentum.";
         return "Keep going! Focus on one habit at a time to improve your daily consistency.";
     }, [habitsData]);
 
@@ -83,7 +67,7 @@ const AnalyticsPage = () => {
                 <p className="text-gray">Deep dive into your progress and experiment outcomes.</p>
             </div>
 
-            {/* Top Row: Consistency & Insights */}
+            {/* Consistency & Insights */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                     <HabitConsistency data={weeklyStats || { completed: [], missed: [] }} />
@@ -93,11 +77,11 @@ const AnalyticsPage = () => {
                 </div>
             </div>
 
-            {/* Middle Row: Top Habits */}
-            <TopHabits habits={topHabits} />
+            {/* Top Habits */}
+            <TopHabits habits={habitsData?.habits || []} />
 
-            {/* Bottom Row: Experiment Impact */}
-            <ExperimentImpact data={experimentsWithBoost} />
+            {/* Experiment Impact */}
+            <ExperimentImpact data={experimentsData || []} />
         </div>
     );
 };

@@ -36,7 +36,7 @@ export class HabitsController {
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('sortBy') sortBy: string,
-    @Query('order') order: "ASC" | "DESC" | undefined,
+    @Query('order') order: "ASC" | "DESC" | undefined = 'ASC',
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
     return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
   }
@@ -66,18 +66,16 @@ export class HabitsController {
 
   @Patch('/:habitId/complete')
   async completeHabit(
-    @Req() req: AuthRequest,
     @Param('habitId') habitId: string,
   ): Promise<ReturnDataType<null>> {
-    return this.habitsService.completeHabit(req.user.id, habitId);
+    return this.habitsService.completeHabit(habitId);
   }
 
   @Patch('/:habitId/skip')
   async skipHabit(
-    @Req() req: AuthRequest,
     @Param('habitId') habitId: string,
   ): Promise<ReturnDataType<null>> {
-    return this.habitsService.skipHabit(req.user.id, habitId);
+    return this.habitsService.skipHabit(habitId);
   }
 
   @Patch('/:id')

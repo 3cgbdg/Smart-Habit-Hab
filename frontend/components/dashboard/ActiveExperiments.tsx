@@ -58,7 +58,7 @@ const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
                                     <div className="flex items-center gap-3 text-xs text-gray">
                                         <div className="flex items-center gap-1">
                                             <Timer className="w-3.5 h-3.5 text-blue" />
-                                            <span>{Math.round(experiment.duration)} days active</span>
+                                            <span>{Math.round(experiment.duration || 0)} days active</span>
                                         </div>
                                         {experiment.variable && (
                                             <div className="flex items-center gap-1">

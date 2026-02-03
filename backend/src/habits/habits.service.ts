@@ -95,15 +95,12 @@ export class HabitsService {
         userId: string,
         analytics: boolean,
     ): Promise<ReturnDataType<IWeekStats>> {
-
-
         const stats = await this.habitLogsService.getWeeklyStats(userId, analytics);
 
         return { data: stats };
     }
 
     async completeHabit(
-        userId: string,
         habitId: string,
     ): Promise<ReturnDataType<null>> {
         const isGood = await this.habitLogsService.completeLog(habitId);
@@ -114,7 +111,6 @@ export class HabitsService {
     }
 
     async skipHabit(
-        userId: string,
         habitId: string,
     ): Promise<ReturnDataType<null>> {
         const isGood = await this.habitLogsService.skipLog(habitId);

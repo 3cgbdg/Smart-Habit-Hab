@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { IExperiment } from "@/types/experiments";
 
 interface ExperimentImpactProps {
-    data: (IExperiment & { consistencyBoost?: number })[];
+    data: IExperiment[];
 }
 
 const ExperimentImpact = ({ data }: ExperimentImpactProps) => {
@@ -18,7 +18,7 @@ const ExperimentImpact = ({ data }: ExperimentImpactProps) => {
             </Box>
             <CardContent className="p-6">
                 <Typography variant="subtitle2" className="text-gray-500 mb-6">
-                    Comparing success rates and consistency boost from your experiments.
+                    Comparing success rates and consistency boost from your latest experiments.
                 </Typography>
                 <div className="h-[350px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
