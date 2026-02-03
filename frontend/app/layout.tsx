@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "../providers/providers";
 import "@/styles/globals.css"
+import CheckEmptyPath from "../components/CheckEmptyPath";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <CheckEmptyPath />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

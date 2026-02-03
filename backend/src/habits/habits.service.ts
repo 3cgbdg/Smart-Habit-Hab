@@ -33,8 +33,8 @@ export class HabitsService {
     userId: string,
     page: number,
     itemsPerPage: number,
-    sortBy: string,
-    order: 'ASC' | 'DESC' | undefined,
+    sortBy: string = 'createdAt',
+    order: 'ASC' | 'DESC' | undefined = 'DESC',
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
     const qb = this.habitRepository
       .createQueryBuilder('habit')

@@ -57,7 +57,7 @@ export class ExperimentsController {
   async findOne(
     @Req() req: AuthRequest,
     @Param('id') id: string,
-  ): Promise<ReturnDataType<Experiment>> {
+  ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
     return this.experimentsService.findOne(req.user.id, id);
   }
 

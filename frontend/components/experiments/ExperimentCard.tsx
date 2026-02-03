@@ -4,6 +4,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import type { IExperiment } from "@/types/experiments";
 import { TrendingUp, Circle } from "lucide-react";
 import { ExperimentUtils } from "@/utils/experiment";
+import { useRouter } from "next/navigation";
 
 interface ExperimentCardProps {
     experiment: IExperiment;
@@ -11,11 +12,13 @@ interface ExperimentCardProps {
 
 const ExperimentCard = ({ experiment }: ExperimentCardProps) => {
     const theme = useTheme();
+    const router = useRouter();
 
-    const statusProps = ExperimentUtils.getStatusStyles(experiment.status);
+    const statusProps = ExperimentUtils.getStatusStyles(experiment.status || 'planned');
 
     return (
         <Box
+            onClick={() => router.push(`/experiments/${experiment.id}`)}
             sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -26,6 +29,7 @@ const ExperimentCard = ({ experiment }: ExperimentCardProps) => {
                 border: '1px solid rgba(0,0,0,0.05)',
                 gap: 4,
                 width: '100%',
+                cursor: 'pointer',
                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                 '&:hover': {
                     transform: 'translateY(-2px)',

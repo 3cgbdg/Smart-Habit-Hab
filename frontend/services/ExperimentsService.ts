@@ -25,6 +25,11 @@ class ExperimentsService {
         return res.data;
     }
 
+    async getExperimentById(id: string): Promise<ApiResponse<IExperiment>> {
+        const res = await api.get(`/experiments/${id}`);
+        return res.data;
+    }
+
     async deleteExperiment(id: string): Promise<ApiResponse<null>> {
         const res = await api.delete(`/experiments/${id}`);
         return res.data;
