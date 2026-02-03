@@ -17,10 +17,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { fetchProfile } from "@/redux/profileSlice";
+import { IUpdateProfilePayload } from "@/types/general";
 
 const SettingsForm = () => {
     const [saving, setSaving] = useState(false);
-    const { user } = useAppSelector((state: any) => state.profile);
+    const { user } = useAppSelector((state) => state.profile);
     const dispatch = useAppDispatch();
 
     const {
@@ -56,7 +57,7 @@ const SettingsForm = () => {
     const onSubmit = async (data: SettingsFormData) => {
         setSaving(true);
 
-        const payload: any = {
+        const payload: IUpdateProfilePayload = {
             darkMode: data.darkMode,
             emailNotifications: data.emailNotifications
         };
@@ -76,8 +77,9 @@ const SettingsForm = () => {
         await updateProfile(payload);
     };
 
+    // update profile mutation
     const { mutateAsync: updateProfile, isPending } = useMutation({
-        mutationFn: async (data: any) => {
+        mutationFn: async (data: IUpdateProfilePayload) => {
             const res = await profilesService.updateProfile(data);
             return res.message || "Settings updated successfully";
         },

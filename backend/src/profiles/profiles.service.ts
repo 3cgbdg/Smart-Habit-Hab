@@ -10,7 +10,7 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 export class ProfilesService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async getOwnProfile(myId: string) {
     const user = await this.userRepository.findOne({
@@ -46,7 +46,9 @@ export class ProfilesService {
     }
 
     if (dto.email && dto.email !== user.email) {
-      const isEmailTaken = await this.userRepository.findOne({ where: { email: dto.email } });
+      const isEmailTaken = await this.userRepository.findOne({
+        where: { email: dto.email },
+      });
       if (isEmailTaken) {
         throw new BadRequestException('Email already taken');
       }
@@ -65,6 +67,6 @@ export class ProfilesService {
       user.emailNotifications = dto.emailNotifications;
     }
     await this.userRepository.save(user);
-    return { message: "Profile updated successfully" };
+    return { message: 'Profile updated successfully' };
   }
 }

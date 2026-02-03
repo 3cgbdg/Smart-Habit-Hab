@@ -12,3 +12,11 @@ export interface IUser {
   darkMode: boolean;
   emailNotifications: boolean;
 }
+
+export interface IUpdateProfilePayload {
+  email?: string;
+  newPassword?: string;
+  currentPassword?: string;
+  darkMode?: boolean;
+  emailNotifications?: boolean;
+}

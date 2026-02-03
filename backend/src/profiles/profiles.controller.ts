@@ -9,7 +9,7 @@ import { ReturnOwnProfile } from 'src/types/profiles';
 @Controller('profiles')
 @UseGuards(AuthGuard('jwt'))
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) { }
+  constructor(private readonly profilesService: ProfilesService) {}
 
   @Get('me')
   async profile(@Req() request: AuthRequest): Promise<ReturnOwnProfile | null> {

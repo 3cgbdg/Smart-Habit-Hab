@@ -1,4 +1,4 @@
-import { ApiResponse, IUser } from "@/types/general";
+import { ApiResponse, IUser, IUpdateProfilePayload } from "@/types/general";
 import { api } from "./axiosInstance";
 
 class ProfilesService {
@@ -10,7 +10,7 @@ class ProfilesService {
     return response.data;
   }
 
-  async updateProfile(data: Partial<IUser> & { currentPassword?: string; newPassword?: string }): Promise<ApiResponse<null>> {
+  async updateProfile(data: IUpdateProfilePayload): Promise<ApiResponse<null>> {
     const response = await api.patch("/profiles/update", data);
     return response.data;
   }
