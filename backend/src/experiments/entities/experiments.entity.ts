@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -15,6 +16,11 @@ export enum ExperimentStatus {
 }
 
 @Entity('experiments')
+@Index('idx_experiments_user_id', ['userId'])
+@Index('idx_experiments_habit_id', ['habitId'])
+@Index('idx_experiments_status', ['status'])
+@Index('idx_experiments_start_date', ['startDate'])
+@Index('idx_experiments_end_date', ['endDate'])
 export class Experiment {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -16,6 +17,8 @@ export enum Status {
 
 @Entity('habit_logs')
 @Unique(['habitId', 'date'])
+@Index('idx_habit_logs_habit_id', ['habitId'])
+@Index('idx_habit_logs_date', ['date'])
 export class HabitLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
