@@ -1,5 +1,3 @@
-
-
 export interface IDayStats {
   date: string;
   count: number;

@@ -20,7 +20,7 @@ import { IWeekStats } from 'src/types/habits';
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
 export class HabitsController {
-  constructor(private readonly habitsService: HabitsService) { }
+  constructor(private readonly habitsService: HabitsService) {}
 
   @Post()
   async create(
@@ -36,9 +36,15 @@ export class HabitsController {
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('sortBy') sortBy: string,
-    @Query('order') order: "ASC" | "DESC" | undefined = 'ASC',
+    @Query('order') order: 'ASC' | 'DESC' | undefined = 'ASC',
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
-    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
+    return this.habitsService.findMyHabits(
+      req.user.id,
+      page,
+      itemsPerPage,
+      sortBy,
+      order,
+    );
   }
 
   @Get('relevant')
@@ -51,7 +57,7 @@ export class HabitsController {
   @Get('stats/weekly')
   async getWeeklyStats(
     @Req() req: AuthRequest,
-    @Query("analytics") analytics: boolean,
+    @Query('analytics') analytics: boolean,
   ): Promise<ReturnDataType<IWeekStats>> {
     return this.habitsService.getWeeklyStats(req.user.id, analytics);
   }

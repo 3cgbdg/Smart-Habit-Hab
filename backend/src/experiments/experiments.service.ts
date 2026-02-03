@@ -13,7 +13,7 @@ export class ExperimentsService {
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
     private readonly habitLogsService: HabitLogsService,
-  ) { }
+  ) {}
 
   async createExperiment(
     userId: string,
@@ -33,8 +33,13 @@ export class ExperimentsService {
     itemsPerPage: number,
     analytics: boolean,
   ): Promise<ReturnDataType<{ data: any[]; total: number }>> {
-    const limit = !analytics ? EXPERIMENT_CONSTANTS.MAX_LIMIT < itemsPerPage ? EXPERIMENT_CONSTANTS.MAX_LIMIT : itemsPerPage
-      : EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT < itemsPerPage ? EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT : itemsPerPage;
+    const limit = !analytics
+      ? EXPERIMENT_CONSTANTS.MAX_LIMIT < itemsPerPage
+        ? EXPERIMENT_CONSTANTS.MAX_LIMIT
+        : itemsPerPage
+      : EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT < itemsPerPage
+        ? EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT
+        : itemsPerPage;
     const [experiments, total] = await this.experimentRepository.findAndCount({
       where: { userId: userId },
       relations: ['habit'],
@@ -56,7 +61,9 @@ export class ExperimentsService {
         return {
           ...exp,
           successRate,
-          ...(analytics && { consistencyBoost: Math.floor(Math.random() * 15) + 5 })
+          ...(analytics && {
+            consistencyBoost: Math.floor(Math.random() * 15) + 5,
+          }),
         };
       }),
     );

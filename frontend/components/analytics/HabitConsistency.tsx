@@ -3,7 +3,7 @@
 import { Card, CardContent, Typography, Box } from "@mui/material"
 import { Activity } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { useMemo } from "react";
+import { useHabitChartData } from "@/hooks/useHabitChartData";
 import { IWeekStats } from "@/types/habits";
 
 interface HabitConsistencyProps {
@@ -12,19 +12,8 @@ interface HabitConsistencyProps {
 
 const HabitConsistency = ({ data }: HabitConsistencyProps) => {
 
-    // memo for caching data with formatted dates
-    const chartData = useMemo(() => {
-        if (!data || !data.completed) return [];
-        return data.completed.map((item, index) => {
-            const date = new Date(item.date);
-            return {
-                day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-                completed: item.count,
-                missed: data.missed ? data.missed[index]?.count : 0,
-                fullDate: item.date
-            };
-        });
-    }, [data]);
+    // use custom hook for caching data with formatted dates
+    const chartData = useHabitChartData(data);
 
     return (
         <Card className="shadow-xs border border-neutral-200 overflow-hidden col-span-2">

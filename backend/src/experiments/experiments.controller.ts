@@ -20,7 +20,7 @@ import { ReturnDataType, IReturnMessage } from 'src/types/common';
 @Controller('experiments')
 @UseGuards(AuthGuard('jwt'))
 export class ExperimentsController {
-  constructor(private readonly experimentsService: ExperimentsService) { }
+  constructor(private readonly experimentsService: ExperimentsService) {}
 
   @Post()
   async createExperiment(

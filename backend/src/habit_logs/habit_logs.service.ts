@@ -10,12 +10,18 @@ interface IHabitMonthlyRawStats {
   completed: string;
 }
 
+interface IWeeklyRawStats {
+  date: Date;
+  completedCount: string;
+  missedCount?: string;
+}
+
 @Injectable()
 export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) { }
+  ) {}
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -75,7 +81,10 @@ export class HabitLogsService {
   }
 
   // weekly stats for multiple habits
-  async getWeeklyStats(userId: string, analytics: boolean): Promise<IWeekStats> {
+  async getWeeklyStats(
+    userId: string,
+    analytics: boolean,
+  ): Promise<IWeekStats> {
     const today = new Date();
     // Get stats for the last 7 days
     const sevenDaysAgo = new Date();
@@ -110,16 +119,19 @@ export class HabitLogsService {
       ).setParameter('missedStatuses', [Status.PENDING, Status.SKIPPED]);
     }
 
-    const statsRaw = await qb.getRawMany();
+    const statsRaw = await qb.getRawMany<IWeeklyRawStats>();
 
     // map raw stats to a lookup object
-    const statsLookup = statsRaw.reduce((acc, row) => {
-      acc[row.date.toISOString().split('T')[0]] = {
-        completed: parseInt(row.completedCount) || 0,
-        missed: analytics ? (parseInt(row.missedCount) || 0) : 0,
-      };
-      return acc;
-    }, {});
+    const statsLookup = statsRaw.reduce(
+      (acc, row) => {
+        acc[row.date.toISOString().split('T')[0]] = {
+          completed: parseInt(row.completedCount) || 0,
+          missed: analytics ? parseInt(row.missedCount || '0') || 0 : 0,
+        };
+        return acc;
+      },
+      {} as Record<string, { completed: number; missed: number }>,
+    );
     const result: IWeekStats = {
       completed: [],
       missed: analytics ? [] : undefined,
