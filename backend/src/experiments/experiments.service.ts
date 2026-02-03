@@ -5,6 +5,7 @@ import { Experiment } from './entities/experiments.entity';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
 import { IReturnMessage, ReturnDataType } from 'src/types/common';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
+import { EXPERIMENT_CONSTANTS } from '../../constants';
 
 @Injectable()
 export class ExperimentsService {
@@ -30,12 +31,15 @@ export class ExperimentsService {
     userId: string,
     page: number,
     itemsPerPage: number,
+    analytics: boolean,
   ): Promise<ReturnDataType<{ data: any[]; total: number }>> {
+    const limit = !analytics ? EXPERIMENT_CONSTANTS.MAX_LIMIT < itemsPerPage ? EXPERIMENT_CONSTANTS.MAX_LIMIT : itemsPerPage
+      : EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT < itemsPerPage ? EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT : itemsPerPage;
     const [experiments, total] = await this.experimentRepository.findAndCount({
       where: { userId: userId },
       relations: ['habit'],
       skip: (page - 1) * itemsPerPage,
-      take: itemsPerPage,
+      take: limit,
       order: { createdAt: 'DESC' },
     });
 
@@ -52,10 +56,10 @@ export class ExperimentsService {
         return {
           ...exp,
           successRate,
+          ...(analytics && { consistencyBoost: Math.floor(Math.random() * 15) + 5 })
         };
       }),
     );
-
     return { data: { data: dataWithSuccessRate, total } };
   }
 

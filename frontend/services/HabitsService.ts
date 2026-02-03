@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/general";
 import { api } from "./axiosInstance";
-import { IHabit, IWeeklyStats } from "@/types/habits";
+import {  IHabit, IWeekStats } from "@/types/habits";
 
 export class HabitsService {
     async getRelevantHabits(): Promise<ApiResponse<IHabit[]>> {
@@ -8,8 +8,8 @@ export class HabitsService {
         return response.data;
     }
 
-    async getWeeklyStats(): Promise<ApiResponse<IWeeklyStats[]>> {
-        const response = await api.get('/habits/stats/weekly');
+    async getWeeklyStats(analytics: boolean): Promise<ApiResponse<IWeekStats>> {
+        const response = await api.get(`/habits/stats/weekly?analytics=${analytics}`);
         return response.data;
     }
 
@@ -23,11 +23,13 @@ export class HabitsService {
         return response.data;
     }
 
-    async getMyHabits(page: number, itemsPerPage: number): Promise<ApiResponse<{ habits: IHabit[], total: number }>> {
+    async getMyHabits(page: number, itemsPerPage: number, sortBy?: string, order?: string): Promise<ApiResponse<{ habits: IHabit[], total: number }>> {
         const response = await api.get('/habits/my', {
             params: {
                 page,
-                itemsPerPage
+                itemsPerPage,
+                sortBy,
+                order
             }
         });
         return response.data;

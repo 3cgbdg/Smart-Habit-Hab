@@ -9,9 +9,15 @@ export interface IHabit {
     isActive?: boolean;
 }
 
-export interface IWeeklyStats {
-    day: string,
-    count: number
+
+export interface IDayStats {
+    date: string;
+    count: number;
+}
+
+export interface IWeekStats {
+    completed: IDayStats[];
+    missed?: IDayStats[];
 }
 
 interface IHabitFormProps {

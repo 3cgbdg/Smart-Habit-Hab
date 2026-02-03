@@ -20,7 +20,7 @@ import { ReturnDataType, IReturnMessage } from 'src/types/common';
 @Controller('experiments')
 @UseGuards(AuthGuard('jwt'))
 export class ExperimentsController {
-  constructor(private readonly experimentsService: ExperimentsService) {}
+  constructor(private readonly experimentsService: ExperimentsService) { }
 
   @Post()
   async createExperiment(
@@ -35,11 +35,13 @@ export class ExperimentsController {
     @Req() req: AuthRequest,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
+    @Query('analytics') analytics: boolean,
   ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
     return this.experimentsService.findMyExperiments(
       req.user.id,
       page,
       itemsPerPage,
+      analytics,
     );
   }
 

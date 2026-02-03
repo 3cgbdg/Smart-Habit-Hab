@@ -19,9 +19,10 @@ export interface IExperiment {
     variable?: string;
     startDate?: string;
     endDate?: string;
-    status: ExperimentStatus;
+    status?: ExperimentStatus;
     successRate?: number;
-    duration: number;
+    duration?: number;
+    consistencyBoost?: number;
 }
 
 export interface IExperimentFormProps {

@@ -27,9 +27,9 @@ const Page = () => {
     })
 
     const { data: weeklyStats, isError: isWeeklyStatsError, error: weeklyStatsError } = useQuery({
-        queryKey: ['weekly-stats'],
+        queryKey: ['weekly-stats-dashboard'],
         queryFn: async () => {
-            const data = await habitsService.getWeeklyStats();
+            const data = await habitsService.getWeeklyStats(false);
             return data.data;
         },
         staleTime: 60 * 1000,
@@ -98,7 +98,7 @@ const Page = () => {
             <TodayHabits habits={habits || []} />
 
             <div className="grid grid-cols-4 gap-6 items-start">
-                <WeeklyProgress data={weeklyStats || []} />
+                <WeeklyProgress data={weeklyStats || { completed: [] }} />
                 <DailyInspiration quote={quote || null} />
             </div>
 

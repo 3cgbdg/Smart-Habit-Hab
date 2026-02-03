@@ -13,14 +13,14 @@ import { HabitsService } from './habits.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { ReturnDataType } from 'src/types/common';
-import { IWeeklyStats } from 'src/types/habits';
 import { Habit } from './entities/habit.entity';
 import type { AuthRequest } from 'src/types/auth';
+import { IWeekStats } from 'src/types/habits';
 
 @Controller('habits')
 @UseGuards(AuthGuard('jwt'))
 export class HabitsController {
-  constructor(private readonly habitsService: HabitsService) {}
+  constructor(private readonly habitsService: HabitsService) { }
 
   @Post()
   async create(
@@ -35,8 +35,10 @@ export class HabitsController {
     @Req() req: AuthRequest,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
+    @Query('sortBy') sortBy: string,
+    @Query('order') order: "ASC" | "DESC" | undefined = 'ASC',
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
-    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage);
+    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
   }
 
   @Get('relevant')
@@ -49,8 +51,9 @@ export class HabitsController {
   @Get('stats/weekly')
   async getWeeklyStats(
     @Req() req: AuthRequest,
-  ): Promise<ReturnDataType<IWeeklyStats[]>> {
-    return this.habitsService.getWeeklyStats(req.user.id);
+    @Query("analytics") analytics: boolean,
+  ): Promise<ReturnDataType<IWeekStats>> {
+    return this.habitsService.getWeeklyStats(req.user.id, analytics);
   }
 
   @Get(':id')
@@ -63,18 +66,16 @@ export class HabitsController {
 
   @Patch('/:habitId/complete')
   async completeHabit(
-    @Req() req: AuthRequest,
     @Param('habitId') habitId: string,
   ): Promise<ReturnDataType<null>> {
-    return this.habitsService.completeHabit(req.user.id, habitId);
+    return this.habitsService.completeHabit(habitId);
   }
 
   @Patch('/:habitId/skip')
   async skipHabit(
-    @Req() req: AuthRequest,
     @Param('habitId') habitId: string,
   ): Promise<ReturnDataType<null>> {
-    return this.habitsService.skipHabit(req.user.id, habitId);
+    return this.habitsService.skipHabit(habitId);
   }
 
   @Patch('/:id')

@@ -14,11 +14,12 @@ class ExperimentsService {
         return res.data;
     }
 
-    async getMyExperiments(page: number, itemsPerPage: number): Promise<ApiResponse<{ data: IExperiment[], total: number }>> {
+    async getMyExperiments(page: number, itemsPerPage: number, analytics?: boolean): Promise<ApiResponse<{ data: IExperiment[], total: number }>> {
         const res = await api.get("/experiments", {
             params: {
                 page,
-                itemsPerPage
+                itemsPerPage,
+                analytics
             }
         });
         return res.data;

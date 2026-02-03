@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
-import { Between, In, Repository } from 'typeorm';
-import { IWeeklyStats } from 'src/types/habits';
+import { Between, Repository } from 'typeorm';
+import { IWeekStats } from 'src/types/habits';
 
 interface IHabitMonthlyRawStats {
   habitId: string;
@@ -15,7 +15,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -75,41 +75,76 @@ export class HabitLogsService {
   }
 
   // weekly stats for multiple habits
-  async getWeeklyStats(habitIds: string[]): Promise<IWeeklyStats[]> {
+  async getWeeklyStats(userId: string, analytics: boolean): Promise<IWeekStats> {
     const today = new Date();
-    const dayOfWeek = today.getDay();
-    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const startOfWeek = new Date(today.setDate(diff));
-    startOfWeek.setHours(0, 0, 0, 0);
+    // Get stats for the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+    const todayDateStr = today.toISOString().split('T')[0];
 
-    const logs = await this.habitLogRepository.find({
-      where: {
-        habitId: In(habitIds),
-        status: Status.COMPLETED,
-        date: Between(
-          startOfWeek.toISOString().split('T')[0],
-          endOfWeek.toISOString().split('T')[0],
-        ),
-      },
-    });
+    // used aggregation in DB for maximum performance
+    const qb = this.habitLogRepository
+      .createQueryBuilder('log')
+      .innerJoin('log.habit', 'habit')
+      .select('log.date', 'date')
+      .addSelect(
+        'SUM(CASE WHEN log.status = :completed THEN 1 ELSE 0 END)',
+        'completedCount',
+      )
+      .where('habit.userId = :userId', { userId })
+      .andWhere('log.date BETWEEN :start AND :end', {
+        start: sevenDaysAgoStr,
+        end: todayDateStr,
+      })
+      .setParameter('completed', Status.COMPLETED)
+      .groupBy('log.date')
+      .orderBy('log.date', 'ASC');
 
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const stats = days.map((day) => ({ day, count: 0 }));
+    if (analytics) {
+      qb.addSelect(
+        'SUM(CASE WHEN log.status IN (:...missedStatuses) THEN 1 ELSE 0 END)',
+        'missedCount',
+      ).setParameter('missedStatuses', [Status.PENDING, Status.SKIPPED]);
+    }
 
-    logs.forEach((log) => {
-      const date = new Date(log.date);
-      let dayIndex = date.getDay() - 1;
-      if (dayIndex === -1) dayIndex = 6;
-      if (stats[dayIndex]) {
-        stats[dayIndex].count++;
+    const statsRaw = await qb.getRawMany();
+
+    // map raw stats to a lookup object
+    const statsLookup = statsRaw.reduce((acc, row) => {
+      acc[row.date.toISOString().split('T')[0]] = {
+        completed: parseInt(row.completedCount) || 0,
+        missed: analytics ? (parseInt(row.missedCount) || 0) : 0,
+      };
+      return acc;
+    }, {});
+    const result: IWeekStats = {
+      completed: [],
+      missed: analytics ? [] : undefined,
+    };
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(sevenDaysAgo);
+      date.setDate(sevenDaysAgo.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+      const stats = statsLookup[dateStr] || { completed: 0, missed: 0 };
+
+      result.completed.push({
+        date: dateStr,
+        count: stats.completed,
+      });
+
+      if (analytics && result.missed) {
+        result.missed.push({
+          date: dateStr,
+          count: stats.missed,
+        });
       }
-    });
+    }
 
-    return stats;
+    return result;
   }
 
   // set status to completed

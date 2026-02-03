@@ -57,6 +57,7 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
         onSuccess: (res) => {
             toast.success(res.message);
             queryClient.invalidateQueries({ queryKey: ['all-experiments'] });
+            queryClient.invalidateQueries({ queryKey: ['experiments-analytics'] });
             onSuccess();
         },
         onError: (error: unknown) => {
