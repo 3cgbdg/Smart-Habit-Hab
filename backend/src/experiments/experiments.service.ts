@@ -93,10 +93,22 @@ export class ExperimentsService {
     userId: string,
     id: string,
   ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
-    const experiment = await this.experimentRepository.findOne({
-      where: { id, userId: userId },
-      relations: ['habit'],
-    });
+    const experiment = await this.experimentRepository.createQueryBuilder('experiment')
+      .innerJoinAndSelect('experiment.habit', 'habit')
+      .select([
+        'experiment.id',
+        'experiment.name',
+        'experiment.variable',
+        'experiment.startDate',
+        'experiment.endDate',
+        'experiment.status',
+        'experiment.habitId',
+        'habit.id',
+        'habit.name',
+      ])
+      .where('experiment.userId = :userId', { userId })
+      .andWhere('experiment.id = :id', { id })
+      .getOne();
 
     if (!experiment) throw new NotFoundException('Experiment not found');
 
