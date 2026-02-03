@@ -21,6 +21,13 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: false })
+  darkMode: boolean;
+
+  @Column({ default: true })
+  emailNotifications: boolean;
+
   @OneToMany(() => Habit, (habit) => habit.user)
   habits: Habit[];
 

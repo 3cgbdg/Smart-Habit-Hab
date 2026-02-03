@@ -98,9 +98,17 @@ export default function Header() {
                         onClose={handleCloseMenu}
                         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                         transformOrigin={{ vertical: "top", horizontal: "right" }}
+                        sx={{
+                            minWidth: "200px",
+                            padding: 1,
+                            mt: 1,
+                        }}
                     >
                         <MenuItem component={Link} href="/dashboard" onClick={handleCloseMenu}>
                             Dashboard
+                        </MenuItem>
+                        <MenuItem component={Link} href="/settings" onClick={handleCloseMenu}>
+                            Settings
                         </MenuItem>
                         <Divider />
                         <MenuItem onClick={handleLogout}>
