@@ -8,7 +8,6 @@ import type { JwtPayload, RequestWithCookies } from 'src/types/auth';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,

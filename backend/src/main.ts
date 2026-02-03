@@ -2,9 +2,10 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/exception-filters/http-exception.filter';
+import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -13,6 +14,9 @@ async function bootstrap() {
 
   // global filter
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // global interceptors
+  app.useGlobalInterceptors(new LoggerInterceptor());
 
   const isDevelopment = configService.get<string>('NODE_ENV') !== 'production';
   app.enableCors({
