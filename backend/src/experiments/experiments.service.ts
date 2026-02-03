@@ -134,16 +134,26 @@ export class ExperimentsService {
     id: string,
     dto: CreateExperimentDto,
   ): Promise<IReturnMessage> {
-    const experiment = await this.findOne(userId, id);
+    const experiment = await this.experimentRepository.findOne({
+      where: { id, userId },
+    });
+
+    if (!experiment) throw new NotFoundException('Experiment not found');
+
     // combining our experminent with dto data we want to update
-    Object.assign(experiment.data, dto);
-    await this.experimentRepository.save(experiment.data);
+    Object.assign(experiment, dto);
+    await this.experimentRepository.save(experiment);
     return { message: 'Successfully updated experiment' };
   }
 
   async remove(userId: string, id: string): Promise<IReturnMessage> {
-    const experiment = await this.findOne(userId, id);
-    await this.experimentRepository.remove(experiment.data);
+    const experiment = await this.experimentRepository.findOne({
+      where: { id, userId },
+    });
+
+    if (!experiment) throw new NotFoundException('Experiment not found');
+
+    await this.experimentRepository.remove(experiment);
     return { message: 'Successfully deleted experiment' };
   }
 }
