@@ -13,7 +13,7 @@ export class ExperimentsService {
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
     private readonly habitLogsService: HabitLogsService,
-  ) {}
+  ) { }
 
   async createExperiment(
     userId: string,
@@ -92,12 +92,29 @@ export class ExperimentsService {
   async findOne(
     userId: string,
     id: string,
-  ): Promise<ReturnDataType<Experiment>> {
+  ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
     const experiment = await this.experimentRepository.findOne({
       where: { id, userId: userId },
+      relations: ['habit'],
     });
+
     if (!experiment) throw new NotFoundException('Experiment not found');
-    return { data: experiment };
+
+    const today = new Date().toISOString().split('T')[0];
+    const endDate = experiment.endDate || today;
+
+    const successRate = await this.habitLogsService.getSuccessRate(
+      experiment.habitId,
+      experiment.startDate,
+      endDate,
+    );
+
+    return {
+      data: {
+        ...(experiment as any),
+        successRate,
+      },
+    };
   }
 
   async update(

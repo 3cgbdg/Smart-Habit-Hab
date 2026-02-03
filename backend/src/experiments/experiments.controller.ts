@@ -20,7 +20,7 @@ import { ReturnDataType, IReturnMessage } from 'src/types/common';
 @Controller('experiments')
 @UseGuards(AuthGuard('jwt'))
 export class ExperimentsController {
-  constructor(private readonly experimentsService: ExperimentsService) {}
+  constructor(private readonly experimentsService: ExperimentsService) { }
 
   @Post()
   async createExperiment(
@@ -57,7 +57,7 @@ export class ExperimentsController {
   async findOne(
     @Req() req: AuthRequest,
     @Param('id') id: string,
-  ): Promise<ReturnDataType<Experiment>> {
+  ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
     return this.experimentsService.findOne(req.user.id, id);
   }
 
