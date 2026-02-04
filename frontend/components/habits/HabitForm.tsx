@@ -41,8 +41,7 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
         },
         onSuccess: (res) => {
             toast.success(res.message);
-            queryClient.invalidateQueries({ queryKey: ['all-habits'] });
-            queryClient.invalidateQueries({ queryKey: ['relevant-habits'] });
+            queryClient.invalidateQueries({ queryKey: ['habits'] });
             if (initialData?.id) {
                 queryClient.invalidateQueries({ queryKey: ['habit', initialData.id] });
             }
@@ -60,71 +59,71 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
 
     return (
         <>
-             
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit(onSubmit)}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 3,
-                        maxWidth: 500,
-                        width: '100%',
-                        bgcolor: 'background.paper',
-                        p: 4,
-                        borderRadius: 2,
-                        boxShadow: 3
-                    }}
+
+            <Box
+                component="form"
+                onSubmit={handleSubmit(onSubmit)}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3,
+                    maxWidth: 500,
+                    width: '100%',
+                    bgcolor: 'background.paper',
+                    p: 4,
+                    borderRadius: 2,
+                    boxShadow: 3
+                }}
+            >
+                <TextField
+                    label="Habit Name"
+                    {...register("name")}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                    fullWidth
+                    variant="outlined"
+                />
+
+                <TextField
+                    label="Description"
+                    {...register("description")}
+                    error={!!errors.description}
+                    helperText={errors.description?.message}
+                    fullWidth
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                />
+
+                <Controller
+                    name="isActive"
+                    control={control}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={field.value}
+                                    onChange={(e) => field.onChange(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="Status Active"
+                        />
+                    )}
+                />
+
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    disabled={mutation.isPending}
+                    sx={{ borderRadius: 10, py: 1.5, fontWeight: 600 }}
                 >
-                    <TextField
-                        label="Habit Name"
-                        {...register("name")}
-                        error={!!errors.name}
-                        helperText={errors.name?.message}
-                        fullWidth
-                        variant="outlined"
-                    />
+                    {mutation.isPending ? "Saving..." : mode === 'create' ? "Create Habit" : "Update Habit"}
+                </Button>
+            </Box>
 
-                    <TextField
-                        label="Description"
-                        {...register("description")}
-                        error={!!errors.description}
-                        helperText={errors.description?.message}
-                        fullWidth
-                        multiline
-                        rows={4}
-                        variant="outlined"
-                    />
-
-                    <Controller
-                        name="isActive"
-                        control={control}
-                        render={({ field }) => (
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={field.value}
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                        color="primary"
-                                    />
-                                }
-                                label="Status Active"
-                            />
-                        )}
-                    />
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        disabled={mutation.isPending}
-                        sx={{ borderRadius: 10, py: 1.5, fontWeight: 600 }}
-                    >
-                        {mutation.isPending ? "Saving..." : mode === 'create' ? "Create Habit" : "Update Habit"}
-                    </Button>
-                </Box>
-            
         </>
     );
 };

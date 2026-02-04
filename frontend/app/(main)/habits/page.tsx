@@ -21,12 +21,12 @@ const Page = () => {
         }
     }, [searchParams, router]);
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['all-habits', page],
+        queryKey: ['habits', 'all', page],
         queryFn: async () => {
             const data = await habitsService.getMyHabits(page, itemsPerPage, 'createdAt', 'DESC');
             return data.data;
         },
-        staleTime: 60 * 1000,   
+        staleTime: 60 * 1000,
         gcTime: 1000 * 60 * 60 * 24,
     })
 

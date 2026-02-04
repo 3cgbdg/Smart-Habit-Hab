@@ -30,7 +30,7 @@ const Page = () => {
     const handleClose = () => setOpen(false);
 
     const { data: experimentsData, isLoading, error } = useQuery({
-        queryKey: ['all-experiments', page],
+        queryKey: ['experiments', 'all', page],
         queryFn: async () => {
             const response = await experimentsService.getMyExperiments(page, itemsPerPage);
             return response.data;

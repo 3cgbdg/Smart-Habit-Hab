@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { DataSource, MoreThan, Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
@@ -14,7 +14,8 @@ export class HabitsService {
     @InjectRepository(Habit)
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
-  ) {}
+    private readonly dataSource: DataSource,
+  ) { }
 
   // creating habit
   async create(
@@ -102,18 +103,22 @@ export class HabitsService {
   }
 
   async completeHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isGood = await this.habitLogsService.completeLog(habitId);
-    if (isGood) {
-      await this.habitRepository.increment({ id: habitId }, 'streak', 1);
-    }
+    await this.dataSource.transaction(async (manager) => {
+      const isGood = await this.habitLogsService.completeLog(habitId, manager);
+      if (isGood) {
+        await manager.increment(Habit, { id: habitId }, 'streak', 1);
+      }
+    });
     return { data: null };
   }
 
   async skipHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isGood = await this.habitLogsService.skipLog(habitId);
-    if (isGood) {
-      await this.habitRepository.update({ id: habitId }, { streak: 0 });
-    }
+    await this.dataSource.transaction(async (manager) => {
+      const isGood = await this.habitLogsService.skipLog(habitId, manager);
+      if (isGood) {
+        await manager.update(Habit, { id: habitId }, { streak: 0 });
+      }
+    });
     return { data: null };
   }
 

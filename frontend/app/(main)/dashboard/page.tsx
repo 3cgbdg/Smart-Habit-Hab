@@ -17,7 +17,7 @@ const Page = () => {
 
     // get endpoints
     const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['relevant-habits'],
+        queryKey: ['habits', 'relevant'],
         queryFn: async () => {
             const data = await habitsService.getRelevantHabits();
             return data.data;
@@ -27,7 +27,7 @@ const Page = () => {
     })
 
     const { data: weeklyStats, isError: isWeeklyStatsError, error: weeklyStatsError } = useQuery({
-        queryKey: ['weekly-stats-dashboard'],
+        queryKey: ['weekly-stats', { type: 'dashboard' }],
         queryFn: async () => {
             const data = await habitsService.getWeeklyStats(false);
             return data.data;
@@ -50,7 +50,7 @@ const Page = () => {
     })
 
     const { data: experiments, isError: isExperimentsError, error: experimentsError } = useQuery({
-        queryKey: ['experiments'],
+        queryKey: ['experiments', 'latest'],
         queryFn: async () => {
             const data = await experimentsService.getLatestExperiments();
             return data.data;
