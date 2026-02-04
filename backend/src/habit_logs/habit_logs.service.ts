@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { IWeekStats } from 'src/types/habits';
 
 interface IHabitMonthlyRawStats {
@@ -21,7 +21,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -40,20 +40,21 @@ export class HabitLogsService {
   }
 
   // set status to completed
-  async completeLog(habitId: string) {
+  async completeLog(habitId: string, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
     const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
+    const existing = await repo.findOne({
       where: { habitId, date: today },
     });
 
     if (existing) {
       if (existing.status === Status.COMPLETED) return true;
       existing.status = Status.COMPLETED;
-      await this.habitLogRepository.save(existing);
+      await repo.save(existing);
       return true;
     }
 
-    await this.habitLogRepository.save({
+    await repo.save({
       habitId,
       date: today,
       status: Status.COMPLETED,
@@ -62,20 +63,21 @@ export class HabitLogsService {
   }
 
   // skip habit log
-  async skipLog(habitId: string) {
+  async skipLog(habitId: string, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
     const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
+    const existing = await repo.findOne({
       where: { habitId, date: today },
     });
 
     if (existing) {
       if (existing.status === Status.SKIPPED) return true;
       existing.status = Status.SKIPPED;
-      await this.habitLogRepository.save(existing);
+      await repo.save(existing);
       return true;
     }
 
-    await this.habitLogRepository.save({
+    await repo.save({
       habitId,
       date: today,
       status: Status.SKIPPED,
