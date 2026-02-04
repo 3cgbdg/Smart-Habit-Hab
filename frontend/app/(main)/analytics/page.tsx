@@ -14,7 +14,7 @@ const AnalyticsPage = () => {
 
 
     const { data: weeklyStats, isError: isWeeklyError, error: weeklyError } = useQuery({
-        queryKey: ['weekly-stats-analytics'],
+        queryKey: ['weekly-stats', { type: 'analytics' }],
         queryFn: async () => {
             const data = await habitsService.getWeeklyStats(true);
             console.log(data)
@@ -24,14 +24,14 @@ const AnalyticsPage = () => {
     });
 
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['all-habits-analytics'],
+        queryKey: ['habits', { type: 'analytics' }],
         queryFn: async () => { const res = await habitsService.getMyHabits(1, 4, 'streak', 'DESC'); return res.data; },
         staleTime: 60 * 1000,
     });
 
 
     const { data: experimentsData, isError: isExpError, error: expError } = useQuery({
-        queryKey: ['experiments-analytics'],
+        queryKey: ['experiments', { type: 'analytics' }],
         queryFn: async () => {
             const data = await experimentsService.getMyExperiments(1, 4, true);
             return data?.data?.data || [];

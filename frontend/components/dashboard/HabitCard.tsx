@@ -20,7 +20,7 @@ const HabitCard = ({ habit, type }: { habit: IHabit, type: 'relevant' | 'all' })
         mutationFn: async () => { const res = await habitsService.completeHabit(habit.id); return res; },
         onSuccess: (data) => {
             toast.success(data.message);
-            queryClient.invalidateQueries({ queryKey: [type === 'relevant' ? 'relevant-habits' : 'all-habits'] });
+            queryClient.invalidateQueries({ queryKey: ['habits'] });
             queryClient.invalidateQueries({ queryKey: ['weekly-stats'] });
         }
     });
@@ -33,7 +33,7 @@ const HabitCard = ({ habit, type }: { habit: IHabit, type: 'relevant' | 'all' })
         mutationFn: async () => { const res = await habitsService.skipHabit(habit.id); return res; },
         onSuccess: (data) => {
             toast.success(data.message);
-            queryClient.invalidateQueries({ queryKey: [type === 'relevant' ? 'relevant-habits' : 'all-habits'] });
+            queryClient.invalidateQueries({ queryKey: ['habits'] });
             queryClient.invalidateQueries({ queryKey: ['weekly-stats'] });
         }
     });
