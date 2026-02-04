@@ -5,7 +5,7 @@ import { HabitsService } from './habits.service';
 
 @Injectable()
 export class HabitCron {
-  constructor(private readonly habitsService: HabitsService) { }
+  constructor(private readonly habitsService: HabitsService) {}
 
   // execute at 12:00 AM
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)

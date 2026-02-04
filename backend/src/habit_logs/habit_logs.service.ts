@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
-import { Between, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IWeekStats } from 'src/types/habits';
 
 interface IHabitMonthlyRawStats {
@@ -21,7 +21,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) { }
+  ) {}
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -38,7 +38,6 @@ export class HabitLogsService {
     await this.habitLogRepository.insert(logs);
     return;
   }
-
 
   // set status to completed
   async completeLog(habitId: string) {
@@ -89,22 +88,24 @@ export class HabitLogsService {
     startDate: string,
     endDate: string,
   ): Promise<number> {
-    const logs = await this.habitLogRepository.createQueryBuilder('log')
-      .where('log.habitId = :habitId', { habitId })
-      .select([
-        "count(*) as total",
-        "sum(CASE WHEN log.status = :completed THEN 1 ELSE 0 END) as completed"
-      ])
-      .andWhere('log.date BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .setParameter('completed', Status.COMPLETED)
-      .getRawOne();
+    const logs: { total: string; completed: string } | undefined =
+      await this.habitLogRepository
+        .createQueryBuilder('log')
+        .where('log.habitId = :habitId', { habitId })
+        .select([
+          'count(*) as total',
+          'sum(CASE WHEN log.status = :completed THEN 1 ELSE 0 END) as completed',
+        ])
+        .andWhere('log.date BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        })
+        .setParameter('completed', Status.COMPLETED)
+        .getRawOne();
 
-
-
-    const total = Number(logs.total);
-    const completed = Number(logs.completed);
+    const total = Number(logs?.total as string);
+    const completed = Number(logs?.completed as string);
     if (total === 0) return 0;
-
 
     return Math.round((completed / total) * 100);
   }
@@ -238,7 +239,6 @@ export class HabitLogsService {
   async updateStatuses() {
     // batch processing
     const BATCH_SIZE = 1000;
-    let lastId: string | null = null;
     const today = new Date().toISOString().split('T')[0];
     while (true) {
       const ids = await this.habitLogRepository
@@ -256,10 +256,8 @@ export class HabitLogsService {
         .createQueryBuilder()
         .update(HabitLog)
         .set({ status: Status.SKIPPED })
-        .whereInIds(ids.map(i => i.id))
+        .whereInIds(ids.map((i) => i.id))
         .execute();
-
     }
-
   }
 }
