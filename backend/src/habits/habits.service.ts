@@ -162,4 +162,11 @@ export class HabitsService {
       lastId = habits[habits.length - 1].id;
     }
   }
+
+  async updateLogsStatus() {
+    await this.habitLogsService.updateStatuses();
+    }
+
+
+    
 }
