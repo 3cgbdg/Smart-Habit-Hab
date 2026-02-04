@@ -8,8 +8,13 @@ import HabitCard from "@/components/dashboard/HabitCard"
 import { Button, Pagination, Box, Typography } from "@mui/material"
 import { useRouter, useSearchParams } from "next/navigation"
 import { PlusIcon } from "lucide-react"
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const Page = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
     const router = useRouter();
     const searchParams = useSearchParams();
     const page = Number(searchParams.get("page")) || 1;
@@ -21,7 +26,8 @@ const Page = () => {
         }
     }, [searchParams, router]);
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['habits', 'all', page],
+        queryKey: ['habits', 'all', page, userId],
+
         queryFn: async () => {
             const data = await habitsService.getMyHabits(page, itemsPerPage, 'createdAt', 'DESC');
             return data.data;

@@ -10,11 +10,16 @@ import { useRouter } from "next/navigation";
 import { HabitFormData, habitSchema } from "@/validation/HabitFormSchema";
 import { IHabitFormProps } from "@/types/habits";
 import { AxiosError } from "axios";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 
 
 
 const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
     const queryClient = useQueryClient();
     const router = useRouter();
     const {
@@ -43,10 +48,11 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
             toast.success(res.message);
             queryClient.invalidateQueries({ queryKey: ['habits'] });
             if (initialData?.id) {
-                queryClient.invalidateQueries({ queryKey: ['habit', initialData.id] });
+                queryClient.invalidateQueries({ queryKey: ['habit', initialData.id, userId] });
             }
             router.push('/habits');
         },
+
         onError: (error: unknown) => {
             const err = error as AxiosError<{ message: string }>;
             toast.error(err?.response?.data?.message || err.message || "Something went wrong");

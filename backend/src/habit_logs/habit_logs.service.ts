@@ -21,7 +21,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) { }
+  ) {}
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -41,7 +41,9 @@ export class HabitLogsService {
 
   // set status to completed
   async completeLog(habitId: string, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
+    const repo = manager
+      ? manager.getRepository(HabitLog)
+      : this.habitLogRepository;
     const today = new Date().toISOString().split('T')[0];
     const existing = await repo.findOne({
       where: { habitId, date: today },
@@ -64,7 +66,9 @@ export class HabitLogsService {
 
   // skip habit log
   async skipLog(habitId: string, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
+    const repo = manager
+      ? manager.getRepository(HabitLog)
+      : this.habitLogRepository;
     const today = new Date().toISOString().split('T')[0];
     const existing = await repo.findOne({
       where: { habitId, date: today },

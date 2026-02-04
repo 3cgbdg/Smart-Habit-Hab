@@ -9,12 +9,18 @@ import HabitConsistency from "@/components/analytics/HabitConsistency";
 import KeyInsights from "@/components/analytics/KeyInsights";
 import TopHabits from "@/components/analytics/TopHabits";
 import ExperimentImpact from "@/components/analytics/ExperimentImpact";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const AnalyticsPage = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
 
 
     const { data: weeklyStats, isError: isWeeklyError, error: weeklyError } = useQuery({
-        queryKey: ['weekly-stats', { type: 'analytics' }],
+        queryKey: ['weekly-stats', { type: 'analytics' }, userId],
+
         queryFn: async () => {
             const data = await habitsService.getWeeklyStats(true);
             console.log(data)
@@ -24,14 +30,16 @@ const AnalyticsPage = () => {
     });
 
     const { data: habitsData, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['habits', { type: 'analytics' }],
+        queryKey: ['habits', { type: 'analytics' }, userId],
+
         queryFn: async () => { const res = await habitsService.getMyHabits(1, 4, 'streak', 'DESC'); return res.data; },
         staleTime: 60 * 1000,
     });
 
 
     const { data: experimentsData, isError: isExpError, error: expError } = useQuery({
-        queryKey: ['experiments', { type: 'analytics' }],
+        queryKey: ['experiments', { type: 'analytics' }, userId],
+
         queryFn: async () => {
             const data = await experimentsService.getMyExperiments(1, 4, true);
             return data?.data?.data || [];

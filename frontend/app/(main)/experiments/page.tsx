@@ -11,8 +11,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import ExperimentCard from "@/components/experiments/ExperimentCard";
 import { Pagination } from "@mui/material";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const Page = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
     const [open, setOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -30,7 +35,8 @@ const Page = () => {
     const handleClose = () => setOpen(false);
 
     const { data: experimentsData, isLoading, error } = useQuery({
-        queryKey: ['experiments', 'all', page],
+        queryKey: ['experiments', 'all', page, userId],
+
         queryFn: async () => {
             const response = await experimentsService.getMyExperiments(page, itemsPerPage);
             return response.data;

@@ -10,14 +10,20 @@ import WeeklyProgress from "@/components/dashboard/WeeklyProgress";
 import DailyInspiration from "@/components/dashboard/DailyInspiration";
 import ActiveExperiments from "@/components/dashboard/ActiveExperiments";
 import experimentsService from "@/services/ExperimentsService";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const Page = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
 
 
 
     // get endpoints
     const { data: habits, isError: isHabitsError, error: habitsError } = useQuery({
-        queryKey: ['habits', 'relevant'],
+        queryKey: ['habits', 'relevant', userId],
+
         queryFn: async () => {
             const data = await habitsService.getRelevantHabits();
             return data.data;
@@ -27,7 +33,8 @@ const Page = () => {
     })
 
     const { data: weeklyStats, isError: isWeeklyStatsError, error: weeklyStatsError } = useQuery({
-        queryKey: ['weekly-stats', { type: 'dashboard' }],
+        queryKey: ['weekly-stats', { type: 'dashboard' }, userId],
+
         queryFn: async () => {
             const data = await habitsService.getWeeklyStats(false);
             return data.data;
@@ -38,7 +45,8 @@ const Page = () => {
 
 
     const { data: quote, isError: isQuoteError, error: quoteError } = useQuery({
-        queryKey: ['random-quote'],
+        queryKey: ['random-quote', userId],
+
         queryFn: async () => {
             const data = await quoteService.getRandomQuote();
             return data.data;
@@ -50,7 +58,8 @@ const Page = () => {
     })
 
     const { data: experiments, isError: isExperimentsError, error: experimentsError } = useQuery({
-        queryKey: ['experiments', 'latest'],
+        queryKey: ['experiments', 'latest', userId],
+
         queryFn: async () => {
             const data = await experimentsService.getLatestExperiments();
             return data.data;

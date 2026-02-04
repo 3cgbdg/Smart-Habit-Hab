@@ -21,12 +21,18 @@ import { toast } from "react-toastify";
 import { experimentSchema, ExperimentFormData } from "@/validation/ExperimentFormSchema";
 import { IExperimentFormProps } from "@/types/experiments";
 import { AxiosError } from "axios";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
     const queryClient = useQueryClient();
 
+
     const { data: habitsData, isLoading: isLoadingHabits } = useQuery({
-        queryKey: ['all-habits-for-select'],
+        queryKey: ['all-habits-for-select', userId],
+
         queryFn: () => habitsService.getMyHabits(1, 100),
     });
 
@@ -85,9 +91,10 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: IExperimentFormProps) 
         onSuccess: (res) => {
             toast.success(res.message);
             queryClient.invalidateQueries({ queryKey: ['experiments'] });
-            queryClient.invalidateQueries({ queryKey: ['experiment', initialData?.id] });
+            queryClient.invalidateQueries({ queryKey: ['experiment', initialData?.id, userId] });
             onSuccess();
         },
+
         onError: (error: unknown) => {
             const err = error as AxiosError<{ message: string }>;
             toast.error(err?.response?.data?.message || err.message || "Something went wrong");

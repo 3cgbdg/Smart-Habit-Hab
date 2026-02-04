@@ -15,7 +15,7 @@ export class HabitsService {
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   // creating habit
   async create(
