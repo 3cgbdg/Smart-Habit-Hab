@@ -14,7 +14,7 @@ export class HabitsService {
     @InjectRepository(Habit)
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
-  ) {}
+  ) { }
 
   // creating habit
   async create(
@@ -38,7 +38,8 @@ export class HabitsService {
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
     const qb = this.habitRepository
       .createQueryBuilder('habit')
-      .where('habit.userId = :userId', { userId });
+      .where('habit.userId = :userId', { userId })
+      .select(['habit.id', 'habit.name', 'habit.createdAt', 'habit.streak']);
 
     const total = await qb.getCount();
 
@@ -152,9 +153,12 @@ export class HabitsService {
         order: { id: 'ASC' },
       });
       if (habits.length === 0) break;
-      for (const habit of habits) {
-        await this.habitLogsService.create(habit.id, today, Status.PENDING);
-      }
+      const habitLogs = habits.map((habit) => ({
+        habitId: habit.id,
+        date: today,
+        status: Status.PENDING,
+      }));
+      await this.habitLogsService.createBulk(habitLogs);
       lastId = habits[habits.length - 1].id;
     }
   }

@@ -15,7 +15,7 @@ export class User {
   id: string;
   @Column({ unique: true })
   email: string;
-  @Column()
+  @Column({ select: false })
   password: string;
   @CreateDateColumn()
   createdAt: Date;

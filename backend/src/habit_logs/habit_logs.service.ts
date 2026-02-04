@@ -21,7 +21,7 @@ export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -31,6 +31,82 @@ export class HabitLogsService {
       status,
     });
     return this.habitLogRepository.save(habitLog);
+  }
+
+  // optmized bulk create habit logs
+  async createBulk(logs: Partial<HabitLog>[]): Promise<void> {
+    await this.habitLogRepository.insert(logs);
+    return;
+  }
+
+
+  // set status to completed
+  async completeLog(habitId: string) {
+    const today = new Date().toISOString().split('T')[0];
+    const existing = await this.habitLogRepository.findOne({
+      where: { habitId, date: today },
+    });
+
+    if (existing) {
+      if (existing.status === Status.COMPLETED) return true;
+      existing.status = Status.COMPLETED;
+      await this.habitLogRepository.save(existing);
+      return true;
+    }
+
+    await this.habitLogRepository.save({
+      habitId,
+      date: today,
+      status: Status.COMPLETED,
+    });
+    return true;
+  }
+
+  // skip habit log
+  async skipLog(habitId: string) {
+    const today = new Date().toISOString().split('T')[0];
+    const existing = await this.habitLogRepository.findOne({
+      where: { habitId, date: today },
+    });
+
+    if (existing) {
+      if (existing.status === Status.SKIPPED) return true;
+      existing.status = Status.SKIPPED;
+      await this.habitLogRepository.save(existing);
+      return true;
+    }
+
+    await this.habitLogRepository.save({
+      habitId,
+      date: today,
+      status: Status.SKIPPED,
+    });
+    return true;
+  }
+
+  async getSuccessRate(
+    habitId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<number> {
+    const logs = await this.habitLogRepository.createQueryBuilder('log')
+      .where('log.habitId = :habitId', { habitId })
+      .select([
+        "count(*) as total",
+        "sum(CASE WHEN log.status = :completed THEN 1 ELSE 0 END) as completed"
+      ])
+      .andWhere('log.date BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .setParameter('completed', Status.COMPLETED)
+      .getRawOne();
+
+
+
+    const total = Number(logs.total);
+    const completed = Number(logs.completed);
+    if (total === 0) return 0;
+
+
+    return Math.round((completed / total) * 100);
   }
 
   // completion rate per month for multiple habits
@@ -157,69 +233,5 @@ export class HabitLogsService {
     }
 
     return result;
-  }
-
-  // set status to completed
-  async completeLog(habitId: string) {
-    const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
-      where: { habitId, date: today },
-    });
-
-    if (existing) {
-      if (existing.status === Status.COMPLETED) return true;
-      existing.status = Status.COMPLETED;
-      await this.habitLogRepository.save(existing);
-      return true;
-    }
-
-    await this.habitLogRepository.save({
-      habitId,
-      date: today,
-      status: Status.COMPLETED,
-    });
-    return true;
-  }
-
-  // skip habit log
-  async skipLog(habitId: string) {
-    const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
-      where: { habitId, date: today },
-    });
-
-    if (existing) {
-      if (existing.status === Status.SKIPPED) return true;
-      existing.status = Status.SKIPPED;
-      await this.habitLogRepository.save(existing);
-      return true;
-    }
-
-    await this.habitLogRepository.save({
-      habitId,
-      date: today,
-      status: Status.SKIPPED,
-    });
-    return true;
-  }
-
-  async getSuccessRate(
-    habitId: string,
-    startDate: string,
-    endDate: string,
-  ): Promise<number> {
-    const logs = await this.habitLogRepository.find({
-      where: {
-        habitId,
-        date: Between(startDate, endDate),
-      },
-    });
-
-    if (logs.length === 0) return 0;
-
-    const completedCount = logs.filter(
-      (log) => log.status === Status.COMPLETED,
-    ).length;
-    return Math.round((completedCount / logs.length) * 100);
   }
 }
