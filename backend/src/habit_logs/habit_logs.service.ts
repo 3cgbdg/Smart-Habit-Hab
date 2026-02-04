@@ -234,4 +234,32 @@ export class HabitLogsService {
 
     return result;
   }
+
+  async updateStatuses() {
+    // batch processing
+    const BATCH_SIZE = 1000;
+    let lastId: string | null = null;
+    const today = new Date().toISOString().split('T')[0];
+    while (true) {
+      const ids = await this.habitLogRepository
+        .createQueryBuilder('log')
+        .select('log.id')
+        .where('log.date < :today', { today })
+        .andWhere('log.status = :status', { status: Status.PENDING })
+        .orderBy('log.date', 'ASC')
+        .limit(BATCH_SIZE)
+        .getRawMany<{ id: string }>();
+
+      if (ids.length === 0) break;
+
+      await this.habitLogRepository
+        .createQueryBuilder()
+        .update(HabitLog)
+        .set({ status: Status.SKIPPED })
+        .whereInIds(ids.map(i => i.id))
+        .execute();
+
+    }
+
+  }
 }
