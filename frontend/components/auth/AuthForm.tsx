@@ -98,7 +98,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 <Button
                     variant="outlined"
                     fullWidth
-                    onClick={() => (window.location.href = "http://localhost:5000/auth/google")}
+                    onClick={() => (window.location.href = "http://localhost:5200/auth/google")}
                     sx={{
                         py: 1,
                         borderColor: "divider",

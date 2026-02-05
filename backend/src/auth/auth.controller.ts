@@ -70,7 +70,8 @@ export class AuthController {
       maxAge: 1000 * 3600 * 24 * 7,
     });
 
-    return res.json({ message: 'Successfully logged in with Google!' });
+    // Redirect to frontend dashboard
+    return res.redirect(this.configService.get<string>('FRONT_END_URL') || 'http://localhost:3000');
   }
 
   @Post('signup')

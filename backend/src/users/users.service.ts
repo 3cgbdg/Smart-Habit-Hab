@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './users.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +12,9 @@ export class UsersService {
 
     async findOrCreateGoogleUser(profile: any): Promise<User> {
         const { id, emails, name, photos } = profile;
+        if (!emails || emails.length === 0) {
+            throw new InternalServerErrorException('Google profile must include an email');
+        }
         const email = emails[0].value;
 
         let user = await this.userRepository.findOne({
