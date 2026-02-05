@@ -71,7 +71,7 @@ export default function Header() {
                     </Box>
                 </Box>
                 <div className="flex items-center gap-2">
-                    <p>{user?.email}</p>
+                    <p>{[user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.email}</p>
                     {/* User menu icon */}
                     <IconButton
                         onClick={handleOpenMenu}
@@ -83,12 +83,18 @@ export default function Header() {
                             color: "white",
                             width: 40,
                             height: 40,
+                            p: 0,
+                            overflow: "hidden",
                             "&:hover": {
                                 backgroundColor: "primary.dark",
                             },
                         }}
                     >
-                        <User size={20} />
+                        {user?.imageUrl ? (
+                            <img src={user.imageUrl} alt="User" style={{ width: '100%', height: '100%', borderRadius: "50%", objectFit: 'cover' }} />
+                        ) : (
+                            <User size={20} />
+                        )}
                     </IconButton>
 
                     <Menu
