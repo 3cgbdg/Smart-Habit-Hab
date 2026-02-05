@@ -15,8 +15,21 @@ export class User {
   id: string;
   @Column({ unique: true })
   email: string;
-  @Column({ select: false })
-  password: string;
+
+  @Column({ select: false, nullable: true })
+  password?: string;
+
+  @Column({ unique: true, nullable: true })
+  googleId?: string;
+
+  @Column({ nullable: true })
+  firstName?: string;
+
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

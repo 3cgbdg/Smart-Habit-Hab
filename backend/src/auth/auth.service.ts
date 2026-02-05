@@ -17,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async signup(
     dto: GeneralAuthDto,
@@ -33,15 +33,7 @@ export class AuthService {
       throw new InternalServerErrorException();
     }
 
-    const access_token = this.jwtService.sign({ userId: user.id });
-    const refresh_token = this.jwtService.sign(
-      { userId: user.id },
-      {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: '7d',
-      },
-    );
-    return { access_token, refresh_token };
+    return this.loginWithUser(user);
   }
 
   async login(
@@ -54,8 +46,15 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException();
     }
-    const isGood = await bcrypt.compare(dto.password, user.password);
+    const isGood = await bcrypt.compare(dto.password, user.password!);
     if (!isGood) throw new InternalServerErrorException();
+
+    return this.loginWithUser(user);
+  }
+
+  async loginWithUser(
+    user: Partial<User>,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const access_token = this.jwtService.sign({ userId: user.id });
     const refresh_token = this.jwtService.sign(
       { userId: user.id },

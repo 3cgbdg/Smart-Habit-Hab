@@ -10,7 +10,7 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 export class ProfilesService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async getOwnProfile(myId: string) {
     const user = await this.userRepository.findOne({
@@ -20,6 +20,9 @@ export class ProfilesService {
         email: true,
         darkMode: true,
         emailNotifications: true,
+        firstName: true,
+        lastName: true,
+        imageUrl: true,
       },
     });
     if (user) {
@@ -38,6 +41,9 @@ export class ProfilesService {
     if (dto.newPassword) {
       if (!dto.currentPassword) {
         throw new BadRequestException('Current password is required');
+      }
+      if (!user.password) {
+        throw new BadRequestException('User has no password');
       }
       const isGood = await bcrypt.compare(dto.currentPassword, user.password);
       if (!isGood) {
