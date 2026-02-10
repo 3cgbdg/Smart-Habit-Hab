@@ -5,7 +5,7 @@ import { Experiment } from './entities/experiments.entity';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
 import { IReturnMessage, ReturnDataType } from 'src/types/common';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
-import { EXPERIMENT_CONSTANTS } from '../../constants';
+import { EXPERIMENT_CONSTANTS } from '../constants/experiments';
 
 @Injectable()
 export class ExperimentsService {

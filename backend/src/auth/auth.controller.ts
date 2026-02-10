@@ -18,8 +18,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { JwtPayload } from 'src/types/auth';
-import { AuthConstants } from 'src/constants/auth';
 import type { IReturnMessage } from 'src/types/common';
+import { AUTH_CONSTANTS } from 'src/constants/auth';
 
 @Controller('auth')
 export class AuthController {
@@ -44,7 +44,7 @@ export class AuthController {
           ? 'none'
           : 'lax',
 
-      maxAge: AuthConstants.MAX_ACCESS_COOKIE_AGE,
+      maxAge: AUTH_CONSTANTS.MAX_ACCESS_COOKIE_AGE,
     });
     res.cookie('refresh_token', response.refresh_token, {
       httpOnly: true,
@@ -54,7 +54,7 @@ export class AuthController {
           ? 'none'
           : 'lax',
 
-      maxAge: AuthConstants.MAX_REFRESH_COOKIE_AGE,
+      maxAge: AUTH_CONSTANTS.MAX_REFRESH_COOKIE_AGE,
     });
     return { message: 'Successfully signed up!' };
   }
@@ -73,7 +73,7 @@ export class AuthController {
           ? 'none'
           : 'lax',
 
-      maxAge: AuthConstants.MAX_ACCESS_COOKIE_AGE,
+      maxAge: AUTH_CONSTANTS.MAX_ACCESS_COOKIE_AGE,
     });
     res.cookie('refresh_token', response.refresh_token, {
       httpOnly: true,
@@ -83,7 +83,7 @@ export class AuthController {
           ? 'none'
           : 'lax',
 
-      maxAge: AuthConstants.MAX_REFRESH_COOKIE_AGE,
+      maxAge: AUTH_CONSTANTS.MAX_REFRESH_COOKIE_AGE,
     });
     return { message: 'Successfully logged in!' };
   }
@@ -117,7 +117,7 @@ export class AuthController {
         this.configService.get<string>('NODE_ENV') === 'production'
           ? 'none'
           : 'lax',
-      maxAge: AuthConstants.MAX_ACCESS_COOKIE_AGE,
+      maxAge: AUTH_CONSTANTS.MAX_ACCESS_COOKIE_AGE,
     });
 
     return { message: 'Access token refreshed' };

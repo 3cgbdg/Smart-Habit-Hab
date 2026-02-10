@@ -1,27 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
 import { Repository } from 'typeorm';
-import { IWeekStats } from 'src/types/habits';
+import { IHabitMonthlyRawStats, IWeeklyRawStats, IWeekStats } from 'src/types/habits';
+import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
+import { DateUtils } from 'src/utils/date.util';
 
-interface IHabitMonthlyRawStats {
-  habitId: string;
-  total: string;
-  completed: string;
-}
-
-interface IWeeklyRawStats {
-  date: Date;
-  completedCount: string;
-  missedCount?: string;
-}
 
 @Injectable()
 export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) {}
+  ) { }
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -39,47 +30,41 @@ export class HabitLogsService {
     return;
   }
 
-  // set status to completed
-  async completeLog(habitId: string) {
-    const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
-      where: { habitId, date: today },
-    });
-
+  async changeStatus(habitId: string, status: Status) {
+    const date = DateUtils.getTodayDateString();
+    const existing = await this.ifLogExistsAndReturn(habitId, date);
     if (existing) {
-      if (existing.status === Status.COMPLETED) return true;
-      existing.status = Status.COMPLETED;
+      if (existing.status === status) return true;
+      existing.status = status;
       await this.habitLogRepository.save(existing);
       return true;
     }
-
     await this.habitLogRepository.save({
       habitId,
-      date: today,
-      status: Status.COMPLETED,
+      date,
+      status,
     });
+    return true;
+  }
+  
+  async ifLogExistsAndReturn(habitId: string, date: string) {
+    const existing = await this.habitLogRepository.findOne({
+      where: { habitId, date },
+    });
+    if (!existing)
+      throw new NotFoundException('Log not found');
+    return existing;
+  }
+
+  // set status to completed
+  async completeLog(habitId: string) {
+    await this.changeStatus(habitId, Status.COMPLETED);
     return true;
   }
 
   // skip habit log
   async skipLog(habitId: string) {
-    const today = new Date().toISOString().split('T')[0];
-    const existing = await this.habitLogRepository.findOne({
-      where: { habitId, date: today },
-    });
-
-    if (existing) {
-      if (existing.status === Status.SKIPPED) return true;
-      existing.status = Status.SKIPPED;
-      await this.habitLogRepository.save(existing);
-      return true;
-    }
-
-    await this.habitLogRepository.save({
-      habitId,
-      date: today,
-      status: Status.SKIPPED,
-    });
+    await this.changeStatus(habitId, Status.SKIPPED);
     return true;
   }
 
@@ -238,8 +223,7 @@ export class HabitLogsService {
 
   async updateStatuses() {
     // batch processing
-    const BATCH_SIZE = 1000;
-    const today = new Date().toISOString().split('T')[0];
+    const today = DateUtils.getTodayDateString();
     while (true) {
       const ids = await this.habitLogRepository
         .createQueryBuilder('log')
@@ -247,7 +231,7 @@ export class HabitLogsService {
         .where('log.date < :today', { today })
         .andWhere('log.status = :status', { status: Status.PENDING })
         .orderBy('log.date', 'ASC')
-        .limit(BATCH_SIZE)
+        .limit(OPTIMIZATION_CONSTANTS.BATCH_SIZE)
         .getRawMany<{ id: string }>();
 
       if (ids.length === 0) break;
