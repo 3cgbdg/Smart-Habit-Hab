@@ -4,10 +4,11 @@ import { Habit } from './entities/habit.entity';
 import { HabitsController } from './habits.controller';
 import { HabitsService } from './habits.service';
 import { HabitLogsModule } from 'src/habit_logs/habit_logs.module';
+import { AnalysisModule } from 'src/analysis/analysis.module';
 import { HabitCron } from './habit.cron';
 @Module({
-  imports: [TypeOrmModule.forFeature([Habit]), HabitLogsModule],
+  imports: [TypeOrmModule.forFeature([Habit]), HabitLogsModule, AnalysisModule],
   controllers: [HabitsController],
   providers: [HabitsService, HabitCron],
 })
-export class HabitsModule {}
+export class HabitsModule { }

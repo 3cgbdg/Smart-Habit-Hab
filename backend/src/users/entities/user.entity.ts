@@ -1,26 +1,14 @@
-import { Experiment } from 'src/experiments/entities/experiments.entity';
+import { Entity, Column, OneToMany } from 'typeorm';
+import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';
 import { Habit } from 'src/habits/entities/habit.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Experiment } from 'src/experiments/entities/experiments.entity';
 
 @Entity({ name: 'users' })
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class User extends BaseAbstractEntity {
   @Column({ unique: true })
   email: string;
   @Column({ select: false })
   password: string;
-  @CreateDateColumn()
-  createdAt: Date;
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @Column({ default: false })
   darkMode: boolean;

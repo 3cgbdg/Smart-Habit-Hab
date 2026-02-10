@@ -1,22 +1,20 @@
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
   Unique,
-  UpdateDateColumn,
 } from 'typeorm';
 import { HabitLog } from '../../habit_logs/entities/habit_log.enitity';
 import { Experiment } from 'src/experiments/entities/experiments.entity';
 
+import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';
+
 @Entity('habits')
 @Unique(['userId', 'name'])
-export class Habit {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Habit extends BaseAbstractEntity {
+
 
   @Column({ type: 'uuid' })
   userId: string;
@@ -30,14 +28,10 @@ export class Habit {
   @OneToMany(() => HabitLog, (log) => log.habit)
   logs: HabitLog[];
 
-  @CreateDateColumn()
-  createdAt: Date;
 
   @Column({ default: true })
   isActive: boolean;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @Column({ default: 0 })
   streak: number;

@@ -7,6 +7,7 @@ import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
 import { IWeekStats } from 'src/types/habits';
 import { Status } from 'src/habit_logs/entities/habit_log.enitity';
+import { AnalysisService } from 'src/analysis/analysis.service';
 
 @Injectable()
 export class HabitsService {
@@ -14,7 +15,8 @@ export class HabitsService {
     @InjectRepository(Habit)
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
-  ) {}
+    private readonly analysisService: AnalysisService,
+  ) { }
 
   // creating habit
   async create(
@@ -51,7 +53,7 @@ export class HabitsService {
 
     const habitIds = habits.map((h) => h.id);
 
-    const stats = await this.habitLogsService.getMonthlyStats(habitIds);
+    const stats = await this.analysisService.getMonthlyStats(habitIds);
     const returnData = habits.map((h) => ({
       ...h,
       completionRate: stats[h.id],
@@ -96,7 +98,7 @@ export class HabitsService {
     userId: string,
     analytics: boolean,
   ): Promise<ReturnDataType<IWeekStats>> {
-    const stats = await this.habitLogsService.getWeeklyStats(userId, analytics);
+    const stats = await this.analysisService.getWeeklyStats(userId, analytics);
 
     return { data: stats };
   }

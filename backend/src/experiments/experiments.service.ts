@@ -7,13 +7,16 @@ import { IReturnMessage, ReturnDataType } from 'src/types/common';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { EXPERIMENT_CONSTANTS } from '../constants/experiments';
 
+import { AnalysisService } from 'src/analysis/analysis.service';
+import { DateUtils } from 'src/utils/date.util';
+
 @Injectable()
 export class ExperimentsService {
   constructor(
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
-    private readonly habitLogsService: HabitLogsService,
-  ) {}
+    private readonly analysisService: AnalysisService,
+  ) { }
 
   async createExperiment(
     userId: string,
@@ -48,12 +51,12 @@ export class ExperimentsService {
       order: { createdAt: 'DESC' },
     });
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = DateUtils.getTodayDateString();
 
     const dataWithSuccessRate = await Promise.all(
       experiments.map(async (exp) => {
         const endDate = exp.endDate || today;
-        const successRate = await this.habitLogsService.getSuccessRate(
+        const successRate = await this.analysisService.getSuccessRate(
           exp.habitId,
           exp.startDate,
           endDate,
@@ -113,10 +116,10 @@ export class ExperimentsService {
 
     if (!experiment) throw new NotFoundException('Experiment not found');
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = DateUtils.getTodayDateString();
     const endDate = experiment.endDate || today;
 
-    const successRate = await this.habitLogsService.getSuccessRate(
+    const successRate = await this.analysisService.getSuccessRate(
       experiment.habitId,
       experiment.startDate,
       endDate,

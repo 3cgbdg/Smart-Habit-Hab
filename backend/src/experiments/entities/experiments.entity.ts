@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
 import { User } from 'src/users/entities/user.entity';
+import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';
 
 export enum ExperimentStatus {
   PLANNED = 'planned',
@@ -21,9 +22,9 @@ export enum ExperimentStatus {
 @Index('idx_experiments_status', ['status'])
 @Index('idx_experiments_start_date', ['startDate'])
 @Index('idx_experiments_end_date', ['endDate'])
-export class Experiment {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+
+
+export class Experiment extends BaseAbstractEntity {
 
   @ManyToOne(() => User, (user) => user.experiments, {
     onDelete: 'CASCADE',
@@ -60,6 +61,5 @@ export class Experiment {
   })
   status: ExperimentStatus;
 
-  @CreateDateColumn()
-  createdAt: Date;
+
 }

@@ -10,7 +10,7 @@ import { ExperimentsModule } from './experiments/experiments.module';
 import { HabitsModule } from './habits/habits.module';
 import { HabitLogsModule } from './habit_logs/habit_logs.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AnalyticsModule } from './analytics/analytics.module';
+import { AnalysisModule } from './analysis/analysis.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -48,9 +48,9 @@ import { AnalyticsModule } from './analytics/analytics.module';
     ProfilesModule,
     QuotesModule,
     HabitLogsModule,
-    AnalyticsModule,
+    AnalysisModule
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

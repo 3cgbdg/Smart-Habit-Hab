@@ -8,6 +8,7 @@ import {
   Unique,
 } from 'typeorm';
 import { Habit } from '../../habits/entities/habit.entity';
+import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';
 
 export enum Status {
   COMPLETED = 'completed',
@@ -19,10 +20,7 @@ export enum Status {
 @Unique(['habitId', 'date'])
 @Index('idx_habit_logs_habit_id', ['habitId'])
 @Index('idx_habit_logs_date', ['date'])
-export class HabitLog {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class HabitLog extends BaseAbstractEntity {
   @ManyToOne(() => Habit, (habit) => habit.logs, {
     onDelete: 'CASCADE',
   })
@@ -36,7 +34,4 @@ export class HabitLog {
 
   @Column({ type: 'enum', enum: Status, default: Status.PENDING })
   status: Status;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
