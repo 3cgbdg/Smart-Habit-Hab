@@ -10,10 +10,10 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 export class ProfilesService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async getOwnProfile(myId: string) {
-    const user = await this.userRepository.findOne({
+    return this.userRepository.findOne({
       where: { id: myId },
       select: {
         id: true,
@@ -22,10 +22,6 @@ export class ProfilesService {
         emailNotifications: true,
       },
     });
-    if (user) {
-      return user;
-    }
-    return null;
   }
 
   async updateProfile(userId: string, dto: UpdateProfileDto) {
@@ -34,7 +30,6 @@ export class ProfilesService {
       throw new BadRequestException('User not found');
     }
 
-    // Check password if sensitive fields are changing
     if (dto.newPassword) {
       if (!dto.currentPassword) {
         throw new BadRequestException('Current password is required');
@@ -43,6 +38,7 @@ export class ProfilesService {
       if (!isGood) {
         throw new UnauthorizedException('Invalid current password');
       }
+      user.password = await bcrypt.hash(dto.newPassword, 10);
     }
 
     if (dto.email && dto.email !== user.email) {
@@ -52,20 +48,10 @@ export class ProfilesService {
       if (isEmailTaken) {
         throw new BadRequestException('Email already taken');
       }
-      user.email = dto.email;
     }
 
-    if (dto.newPassword) {
-      user.password = await bcrypt.hash(dto.newPassword, 10);
-    }
+    this.userRepository.merge(user, dto);
 
-    if (dto.darkMode !== undefined) {
-      user.darkMode = dto.darkMode;
-    }
-
-    if (dto.emailNotifications !== undefined) {
-      user.emailNotifications = dto.emailNotifications;
-    }
     await this.userRepository.save(user);
     return { message: 'Profile updated successfully' };
   }

@@ -8,6 +8,8 @@ import { ReturnDataType } from 'src/types/common';
 import { IWeekStats } from 'src/types/habits';
 import { Status } from 'src/habit_logs/entities/habit_log.enitity';
 import { AnalysisService } from 'src/analysis/analysis.service';
+import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
+import { DateUtils } from 'src/utils/date.util';
 
 @Injectable()
 export class HabitsService {
@@ -106,18 +108,29 @@ export class HabitsService {
   async completeHabit(habitId: string): Promise<ReturnDataType<null>> {
     const isGood = await this.habitLogsService.completeLog(habitId);
     if (isGood) {
-      await this.habitRepository.increment({ id: habitId }, 'streak', 1);
+      await this.updateStreak(habitId, 'increment');
     }
     return { data: null };
   }
 
+  async updateStreak(habitId: string, type: 'increment' | 'reset') {
+    if (type === 'increment') {
+      await this.habitRepository.increment({ id: habitId }, 'streak', 1);
+    } else {
+      await this.habitRepository.update({ id: habitId }, { streak: 0 });
+    }
+  }
+
+
   async skipHabit(habitId: string): Promise<ReturnDataType<null>> {
     const isGood = await this.habitLogsService.skipLog(habitId);
     if (isGood) {
-      await this.habitRepository.update({ id: habitId }, { streak: 0 });
+      await this.updateStreak(habitId, 'reset');
     }
     return { data: null };
   }
+
+
 
   async updateHabit(
     userId: string,
@@ -144,28 +157,33 @@ export class HabitsService {
 
   // CRON for creating  logs
   async createDailyLogs() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = DateUtils.getTodayDateString();
     // batch processing
-    const BATCH_SIZE = 1000;
     let lastId: string | null = null;
     while (true) {
-      const habits = await this.habitRepository.find({
-        take: BATCH_SIZE,
-        where: lastId ? { id: MoreThan(lastId) } : {},
-        order: { id: 'ASC' },
-      });
-      if (habits.length === 0) break;
-      const habitLogs = habits.map((habit) => ({
-        habitId: habit.id,
-        date: today,
-        status: Status.PENDING,
-      }));
-      await this.habitLogsService.createBulk(habitLogs);
-      lastId = habits[habits.length - 1].id;
+      const { hasMore, lastId: newLastId } = await this.createLogsForHabits(lastId, today);
+      if (!hasMore) break;
+      lastId = newLastId;
     }
   }
 
   async updateLogsStatus() {
     await this.habitLogsService.updateStatuses();
+  }
+
+  private async createLogsForHabits(lastId: string | null, date: string): Promise<{ hasMore: boolean, lastId: string }> {
+    const habits = await this.habitRepository.find({
+      take: OPTIMIZATION_CONSTANTS.BATCH_SIZE,
+      where: lastId ? { id: MoreThan(lastId) } : {},
+      order: { id: 'ASC' },
+    });
+    if (habits.length === 0) return { hasMore: false, lastId: '' };
+    const habitLogs = habits.map((habit) => ({
+      habitId: habit.id,
+      date,
+      status: Status.PENDING,
+    }));
+    await this.habitLogsService.createBulk(habitLogs);
+    return { hasMore: true, lastId: habits[habits.length - 1].id };
   }
 }

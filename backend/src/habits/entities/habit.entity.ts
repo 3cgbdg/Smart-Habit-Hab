@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { HabitLog } from '../../habit_logs/entities/habit_log.enitity';
 import { Experiment } from 'src/experiments/entities/experiments.entity';
-
 import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';
 
 @Entity('habits')

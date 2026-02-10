@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 import { QuotesController } from './quotes.controller';
 import { HttpModule } from '@nestjs/axios';
+import { ZenQuotesClient } from './clients/zenquotes.client';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { HttpModule } from '@nestjs/axios';
     }),
   ],
   controllers: [QuotesController],
-  providers: [QuotesService],
+  providers: [QuotesService, ZenQuotesClient],
 })
 export class QuotesModule {}

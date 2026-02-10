@@ -2,27 +2,23 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { IQuoteResponse } from 'src/types/quotes';
+import { Logger } from '@nestjs/common';
+import { ZenQuotesClient } from './clients/zenquotes.client';
 
 @Injectable()
 export class QuotesService {
-  constructor(private readonly httpService: HttpService) {}
-  private readonly apiUrl = 'https://zenquotes.io/api';
+  constructor(private readonly zenQuotesClient: ZenQuotesClient) { }
   async getRandomQuote() {
     try {
-      const response = await firstValueFrom(
-        this.httpService.get<IQuoteResponse>(`${this.apiUrl}/random`),
-      );
-      const quote = response.data[0];
-      if (!quote) throw new Error('No quote found');
+      const response = await this.zenQuotesClient.fetchRandomQuote();
 
+      const quote = response[0];
+      if (!quote) throw new Error('Empty response from ZenQuotes');
       return {
         data: { author: quote.a, content: quote.q },
       };
-    } catch {
-      throw new HttpException(
-        'Failed to fetch quote',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      throw new HttpException('Quote service is temporarily unavailable', 500);
     }
   }
 }
