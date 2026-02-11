@@ -6,9 +6,11 @@ import { HabitsService } from './habits.service';
 import { HabitLogsModule } from 'src/habit_logs/habit_logs.module';
 import { AnalysisModule } from 'src/analysis/analysis.module';
 import { HabitCron } from './habit.cron';
+import { StreakService } from './streak.service';
+
 @Module({
   imports: [TypeOrmModule.forFeature([Habit]), HabitLogsModule, AnalysisModule],
   controllers: [HabitsController],
-  providers: [HabitsService, HabitCron],
+  providers: [HabitsService, HabitCron, StreakService],
 })
 export class HabitsModule { }

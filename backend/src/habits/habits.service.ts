@@ -12,6 +12,8 @@ import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
 import { DateUtils } from 'src/utils/date.util';
 import { BatchUtils } from 'src/utils/batch.util';
 import { PaginationUtils } from 'src/utils/pagination.util';
+import { StreakService } from './streak.service';
+import { HABIT_SELECT_FIELDS, HABIT_RELEVANT_SELECT_FIELDS } from './habits.constants';
 
 @Injectable()
 export class HabitsService {
@@ -20,6 +22,7 @@ export class HabitsService {
     private readonly habitRepository: Repository<Habit>,
     private readonly habitLogsService: HabitLogsService,
     private readonly analysisService: AnalysisService,
+    private readonly streakService: StreakService,
   ) { }
 
   // creating habit
@@ -45,7 +48,7 @@ export class HabitsService {
     const qb = this.habitRepository
       .createQueryBuilder('habit')
       .where('habit.userId = :userId', { userId })
-      .select(['habit.id', 'habit.name', 'habit.createdAt', 'habit.streak'])
+      .select(HABIT_SELECT_FIELDS)
       .orderBy(`habit.${sortBy}`, order);
 
     const { items: habits, total } = await PaginationUtils.paginate(qb, page, itemsPerPage);
@@ -75,7 +78,7 @@ export class HabitsService {
     const data = await this.habitRepository
       .createQueryBuilder('habit')
       .leftJoin('habit.logs', 'log')
-      .select(['habit.id', 'habit.name', 'habit.streak'])
+      .select(HABIT_RELEVANT_SELECT_FIELDS)
       .where('habit.userId = :userId', { userId })
       .andWhere('habit.isActive = :isActive', { isActive: true })
       .andWhere('(log.id IS NULL OR log.status = :status)', {
@@ -99,29 +102,18 @@ export class HabitsService {
   async completeHabit(habitId: string): Promise<ReturnDataType<null>> {
     const isGood = await this.habitLogsService.completeLog(habitId);
     if (isGood) {
-      await this.updateStreak(habitId, 'increment');
+      await this.streakService.incrementStreak(habitId);
     }
     return { data: null };
   }
-
-  async updateStreak(habitId: string, type: 'increment' | 'reset') {
-    if (type === 'increment') {
-      await this.habitRepository.increment({ id: habitId }, 'streak', 1);
-    } else {
-      await this.habitRepository.update({ id: habitId }, { streak: 0 });
-    }
-  }
-
 
   async skipHabit(habitId: string): Promise<ReturnDataType<null>> {
     const isGood = await this.habitLogsService.skipLog(habitId);
     if (isGood) {
-      await this.updateStreak(habitId, 'reset');
+      await this.streakService.resetStreak(habitId);
     }
     return { data: null };
   }
-
-
 
   async updateHabit(
     userId: string,
