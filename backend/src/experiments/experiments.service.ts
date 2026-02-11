@@ -53,23 +53,24 @@ export class ExperimentsService {
 
     const today = DateUtils.getTodayDateString();
 
-    const dataWithSuccessRate = await Promise.all(
-      experiments.map(async (exp) => {
-        const endDate = exp.endDate || today;
-        const successRate = await this.analysisService.getSuccessRate(
-          exp.habitId,
-          exp.startDate,
-          endDate,
-        );
-        return {
-          ...exp,
-          successRate,
-          ...(analytics && {
-            consistencyBoost: Math.floor(Math.random() * 15) + 5,
-          }),
-        };
-      }),
-    );
+    const successRatesQueries = experiments.map((exp) => ({
+      habitId: exp.habitId,
+      startDate: exp.startDate,
+      endDate: exp.endDate || today,
+    }));
+
+    const successRates = await this.analysisService.getBulkSuccessRates(successRatesQueries);
+
+    const dataWithSuccessRate = experiments.map((exp) => {
+      const successRate = successRates[exp.habitId] || 0;
+      return {
+        ...exp,
+        successRate,
+        ...(analytics && {
+          consistencyBoost: Math.floor(Math.random() * 15) + 5,
+        }),
+      };
+    });
     return { data: { data: dataWithSuccessRate, total } };
   }
 

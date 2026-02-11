@@ -23,18 +23,48 @@ export class AnalysisService {
         startDate: string,
         endDate: string,
     ): Promise<number> {
-        const logs = await this.habitLogRepository
-            .createQueryBuilder('log')
-            .select('count(*)', 'total')
-            .where('log.habitId = :habitId', { habitId })
-            .andWhere('log.date BETWEEN :startDate AND :endDate', { startDate, endDate })
-            .addSelect('sum(CASE WHEN log.status = :completed THEN 1 ELSE 0 END)', 'completed')
-            .setParameter('completed', Status.COMPLETED)
-            .getRawOne();
+        const rates = await this.getBulkSuccessRates([{ habitId, startDate, endDate }]);
+        return rates[habitId] || 0;
+    }
 
-        const total = Number(logs?.total || 0);
-        const completed = Number(logs?.completed || 0);
-        return total === 0 ? 0 : Math.round((completed / total) * 100);
+    async getBulkSuccessRates(
+        queries: { habitId: string; startDate: string; endDate: string }[]
+    ): Promise<Record<string, number>> {
+        if (queries.length === 0) return {};
+
+        const qb = this.habitLogRepository.createQueryBuilder('log')
+            .select('log.habitId', 'habitId')
+            .addSelect('COUNT(*)', 'total')
+            .addSelect('SUM(CASE WHEN log.status = :completed THEN 1 ELSE 0 END)', 'completed')
+            .setParameter('completed', Status.COMPLETED);
+
+        queries.forEach((q, index) => {
+            const condition = `(log.habitId = :hId${index} AND log.date BETWEEN :sDate${index} AND :eDate${index})`;
+            if (index === 0) {
+                qb.where(condition);
+            } else {
+                qb.orWhere(condition);
+            }
+            qb.setParameter(`hId${index}`, q.habitId);
+            qb.setParameter(`sDate${index}`, q.startDate);
+            qb.setParameter(`eDate${index}`, q.endDate);
+        });
+
+        const stats = await qb.groupBy('log.habitId').getRawMany();
+
+        const result: Record<string, number> = {};
+        stats.forEach((s) => {
+            const total = parseInt(s.total);
+            const completed = parseInt(s.completed);
+            result[s.habitId] = total > 0 ? Math.round((completed / total) * 100) : 0;
+        });
+
+        // ensure all queried habitIds are in the result
+        queries.forEach(q => {
+            if (!(q.habitId in result)) result[q.habitId] = 0;
+        });
+
+        return result;
     }
 
     async getMonthlyStats(habitIds: string[]): Promise<Record<string, number>> {
