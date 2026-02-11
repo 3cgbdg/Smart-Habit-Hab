@@ -4,6 +4,7 @@ import { HabitLog, Status } from './entities/habit_log.enitity';
 import { Repository } from 'typeorm';
 import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
 import { DateUtils } from 'src/utils/date.util';
+import { BatchUtils } from 'src/utils/batch.util';
 
 
 @Injectable()
@@ -71,26 +72,26 @@ export class HabitLogsService {
   }
 
   async updateStatuses() {
-    // batch processing
     const today = DateUtils.getTodayDateString();
-    while (true) {
-      const ids = await this.habitLogRepository
+
+    await BatchUtils.processRemainingInBatches(
+      () => this.habitLogRepository
         .createQueryBuilder('log')
         .select('log.id')
         .where('log.date < :today', { today })
         .andWhere('log.status = :status', { status: Status.PENDING })
         .orderBy('log.date', 'ASC')
         .limit(OPTIMIZATION_CONSTANTS.BATCH_SIZE)
-        .getRawMany<{ id: string }>();
-
-      if (ids.length === 0) break;
-
-      await this.habitLogRepository
-        .createQueryBuilder()
-        .update(HabitLog)
-        .set({ status: Status.SKIPPED })
-        .whereInIds(ids.map((i) => i.id))
-        .execute();
-    }
+        .getRawMany<{ id: string }>(),
+      async (rawIds) => {
+        const ids = rawIds.map((i) => i.id);
+        await this.habitLogRepository
+          .createQueryBuilder()
+          .update(HabitLog)
+          .set({ status: Status.SKIPPED })
+          .whereInIds(ids)
+          .execute();
+      }
+    );
   }
 }

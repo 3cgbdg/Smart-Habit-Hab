@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { DataSource, MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
@@ -10,6 +10,8 @@ import { Status } from 'src/habit_logs/entities/habit_log.enitity';
 import { AnalysisService } from 'src/analysis/analysis.service';
 import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
 import { DateUtils } from 'src/utils/date.util';
+import { BatchUtils } from 'src/utils/batch.util';
+import { PaginationUtils } from 'src/utils/pagination.util';
 
 @Injectable()
 export class HabitsService {
@@ -43,15 +45,10 @@ export class HabitsService {
     const qb = this.habitRepository
       .createQueryBuilder('habit')
       .where('habit.userId = :userId', { userId })
-      .select(['habit.id', 'habit.name', 'habit.createdAt', 'habit.streak']);
+      .select(['habit.id', 'habit.name', 'habit.createdAt', 'habit.streak'])
+      .orderBy(`habit.${sortBy}`, order);
 
-    const total = await qb.getCount();
-
-    const habits = await qb
-      .orderBy(`habit.${sortBy}`, order)
-      .skip((page - 1) * itemsPerPage)
-      .take(itemsPerPage)
-      .getMany();
+    const { items: habits, total } = await PaginationUtils.paginate(qb, page, itemsPerPage);
 
     const habitIds = habits.map((h) => h.id);
 
@@ -69,13 +66,7 @@ export class HabitsService {
     userId: string,
     id: string,
   ): Promise<ReturnDataType<Habit>> {
-    const habit = await this.habitRepository.findOne({
-      where: { id: id, userId: userId },
-    });
-
-    if (!habit) {
-      throw new NotFoundException('Habit not found');
-    }
+    const habit = await this.getHabitOrThrow(id, userId);
     return { data: habit };
   }
 
@@ -137,13 +128,7 @@ export class HabitsService {
     id: string,
     dto: CreateHabitDto,
   ): Promise<ReturnDataType<Habit>> {
-    const habit = await this.habitRepository.findOne({
-      where: { id: id, userId: userId },
-    });
-
-    if (!habit) {
-      throw new NotFoundException('Habit not found');
-    }
+    const habit = await this.getHabitOrThrow(id, userId);
 
     habit.name = dto.name;
     habit.description = dto.description;
@@ -158,32 +143,33 @@ export class HabitsService {
   // CRON for creating  logs
   async createDailyLogs() {
     const today = DateUtils.getTodayDateString();
-    // batch processing
-    let lastId: string | null = null;
-    while (true) {
-      const { hasMore, lastId: newLastId } = await this.createLogsForHabits(lastId, today);
-      if (!hasMore) break;
-      lastId = newLastId;
-    }
+
+    await BatchUtils.processInBatches(
+      (lastId) => this.habitRepository.find({
+        take: OPTIMIZATION_CONSTANTS.BATCH_SIZE,
+        where: lastId ? { id: MoreThan(lastId) } : {},
+        order: { id: 'ASC' },
+      }),
+      async (habits) => {
+        const habitLogs = habits.map((habit) => ({
+          habitId: habit.id,
+          date: today,
+          status: Status.PENDING,
+        }));
+        await this.habitLogsService.createBulk(habitLogs);
+      }
+    );
   }
 
   async updateLogsStatus() {
     await this.habitLogsService.updateStatuses();
   }
 
-  private async createLogsForHabits(lastId: string | null, date: string): Promise<{ hasMore: boolean, lastId: string }> {
-    const habits = await this.habitRepository.find({
-      take: OPTIMIZATION_CONSTANTS.BATCH_SIZE,
-      where: lastId ? { id: MoreThan(lastId) } : {},
-      order: { id: 'ASC' },
-    });
-    if (habits.length === 0) return { hasMore: false, lastId: '' };
-    const habitLogs = habits.map((habit) => ({
-      habitId: habit.id,
-      date,
-      status: Status.PENDING,
-    }));
-    await this.habitLogsService.createBulk(habitLogs);
-    return { hasMore: true, lastId: habits[habits.length - 1].id };
+  private async getHabitOrThrow(id: string, userId: string): Promise<Habit> {
+    const habit = await this.habitRepository.findOne({ where: { id, userId } });
+    if (!habit) {
+      throw new NotFoundException('Habit not found');
+    }
+    return habit;
   }
 }
