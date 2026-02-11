@@ -18,10 +18,8 @@ import { GeneralAuthDto } from './dto/general-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { JwtPayload } from 'src/types/auth';
 import type { IReturnMessage } from 'src/types/common';
 import { AUTH_CONSTANTS } from 'src/constants/auth';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -34,40 +32,24 @@ export class AuthController {
 
 
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth() {
-    // triggers google auth redirect
-  }
-
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    const profile = req.user as any;
-    if (!profile) {
-      throw new HttpException('Google authentication failed', HttpStatus.UNAUTHORIZED);
+  @Post('google')
+  async googleAuth(
+    @Body('token') token: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IReturnMessage> {
+    if (!token) {
+      throw new HttpException('Token is required', HttpStatus.BAD_REQUEST);
     }
 
-    const user = await this.authService.findOrCreateGoogleUser(profile);
+    const payload = await this.authService.verifyGoogleToken(token);
+    const user = await this.authService.findOrCreateGoogleUser(payload);
 
     const access_token = await this.authService.createTokenForAccess(user.id);
     const refresh_token = await this.authService.createTokenForRefresh(user.id);
 
     this.setCookies(res, access_token, refresh_token);
 
-    const frontendUrl = this.configService.get<string>('FRONT_END_URL') || 'http://localhost:3000';
-
-    // Повертаємо HTML з скриптом для навігації на фронтенд. 
-    // Це дозволяє фронтенду "підхопити" стан і уникнути проблем з жорстким редіректом.
-    return res.send(`
-      <html>
-        <body>
-          <script>
-            window.location.href = "${frontendUrl}/auth/login";
-          </script>
-        </body>
-      </html>
-    `);
+    return { message: 'Successfully logged in with Google!' };
   }
 
 

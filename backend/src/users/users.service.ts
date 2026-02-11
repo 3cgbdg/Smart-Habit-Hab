@@ -12,33 +12,38 @@ export class UsersService {
     ) { }
 
     async findOrCreateGoogleUser(profile: any): Promise<User> {
-        const { id, emails, name, photos } = profile;
-        if (!emails || emails.length === 0) {
+        // Map fields from either Passport profile OR Google ID Token payload
+        const googleId = profile.id || profile.sub;
+        const email = profile.emails ? profile.emails[0].value : profile.email;
+        const firstName = profile.name?.givenName || profile.given_name;
+        const lastName = profile.name?.familyName || profile.family_name;
+        const imageUrl = profile.photos ? profile.photos[0].value : profile.picture;
+
+        if (!email) {
             throw new InternalServerErrorException('Google profile must include an email');
         }
-        const email = emails[0].value;
 
         let user = await this.userRepository.findOne({
-            where: [{ googleId: id }, { email }],
+            where: [{ googleId }, { email }],
         });
 
         if (user) {
             if (!user.googleId) {
-                user.googleId = id;
-                user.firstName = name?.givenName;
-                user.lastName = name?.familyName;
-                user.imageUrl = photos?.[0]?.value;
+                user.googleId = googleId;
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.imageUrl = imageUrl;
                 await this.userRepository.save(user);
             }
             return user;
         }
 
         user = this.userRepository.create({
-            googleId: id,
+            googleId,
             email,
-            firstName: name?.givenName,
-            lastName: name?.familyName,
-            imageUrl: photos?.[0]?.value,
+            firstName,
+            lastName,
+            imageUrl,
         });
 
         return this.userRepository.save(user);

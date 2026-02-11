@@ -76,11 +76,26 @@ export class AuthService {
 
 
   async getJwtPayloadFromRefreshToken(refreshToken: string): Promise<JwtPayload> {
-   const decode = this.jwtService.decode(refreshToken);
+    const decode = this.jwtService.decode(refreshToken);
     if (!decode) {
       throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
     return decode as JwtPayload;
   }
-  
+
+  async verifyGoogleToken(token: string): Promise<any> {
+    const client = new (await import('google-auth-library')).OAuth2Client(
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+    );
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      });
+      return ticket.getPayload();
+    } catch (error) {
+      console.error('Google token verification failed:', error);
+      throw new HttpException('Invalid Google token', HttpStatus.UNAUTHORIZED);
+    }
+  }
 }

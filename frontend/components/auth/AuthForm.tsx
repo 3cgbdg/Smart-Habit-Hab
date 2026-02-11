@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import NextLink from "next/link";
 import { AuthFormData, AuthFormSchema } from "@/validation/AuthFormSchema";
 import authService from "@/services/AuthService";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface AuthFormProps {
     mode: "login" | "signup";
@@ -95,22 +96,28 @@ export default function AuthForm({ mode }: AuthFormProps) {
                     <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
                 </Box>
 
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    onClick={() => (window.location.href = "http://localhost:5200/auth/google")}
-                    sx={{
-                        py: 1,
-                        borderColor: "divider",
-                        color: "text.primary",
-                        "&:hover": {
-                            bgcolor: "action.hover",
-                            borderColor: "text.primary",
-                        },
-                    }}
-                >
-                    {isLogin ? "Sign in with Google" : "Sign up with Google"}
-                </Button>
+                <Box sx={{ alignSelf: "center", width: "100%", display: "flex", justifyContent: "center" }}>
+                    <GoogleLogin
+                        onSuccess={async (credentialResponse) => {
+                            if (credentialResponse.credential) {
+                                try {
+                                    const response = await authService.googleLogin(credentialResponse.credential);
+                                    toast.success(response.message);
+                                    router.push("/dashboard");
+                                } catch (err: unknown) {
+                                    const error = err as AxiosError<{ message: string }>;
+                                    toast.error(error?.response?.data?.message || "Google Login failed");
+                                }
+                            }
+                        }}
+                        onError={() => {
+                            toast.error("Google Login Failed");
+                        }}
+                        useOneTap
+                        text={isLogin ? "signin_with" : "signup_with"}
+                        width="400"
+                    />
+                </Box>
 
                 <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
                     {isLogin ? "Don't have an account? " : "Already have an account? "}

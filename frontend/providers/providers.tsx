@@ -9,6 +9,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { ToastContainer } from "react-toastify";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const theme = createTheme({
   palette: {
@@ -56,20 +57,22 @@ export function AppProviders({ children }: AppProvidersProps) {
   );
 
   return (
-    <ReduxProvider store={store}>
-      {persister ? (
-        <PersistQueryClientProvider
-          client={queryClient}
-          persistOptions={{ persister }}
-        >
-          {content}
-        </PersistQueryClientProvider>
-      ) : (
-        <QueryClientProvider client={queryClient}>
-          {content}
-        </QueryClientProvider>
-      )}
-    </ReduxProvider>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+      <ReduxProvider store={store}>
+        {persister ? (
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister }}
+          >
+            {content}
+          </PersistQueryClientProvider>
+        ) : (
+          <QueryClientProvider client={queryClient}>
+            {content}
+          </QueryClientProvider>
+        )}
+      </ReduxProvider>
+    </GoogleOAuthProvider>
   );
 }
 
