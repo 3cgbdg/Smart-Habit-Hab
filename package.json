@@ -1,5 +1,19 @@
 {
+  "name": "smart-habit-lab",
+  "version": "1.0.0",
+  "packageManager": "npm@11.6.2",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean": "turbo clean"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.10"
+    "turbo": "^2.0.0"
   }
 }

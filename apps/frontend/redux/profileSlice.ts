@@ -1,5 +1,5 @@
 import ProfilesService from "@/services/ProfilesService";
-import { IUser } from "@/types/general";
+import { IUser } from "@/types/profiles";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
