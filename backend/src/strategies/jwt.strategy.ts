@@ -13,9 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     super({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: RequestWithCookies): string | null => {
           return req.cookies?.access_token ?? null;

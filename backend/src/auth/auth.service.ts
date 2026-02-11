@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,6 +13,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
+import { Response } from 'express';
+import { JwtPayload } from 'src/types/auth';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +42,7 @@ export class AuthService {
     dto: GeneralAuthDto,
   ): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.usersService.returnUserPassAndId(dto.email);
-    const isGood = await bcrypt.compare(dto.password, user.password);
+    const isGood = await bcrypt.compare(dto.password, user.password ?? '');
     if (!isGood) throw new InternalServerErrorException();
     const access_token = await this.createTokenForAccess(user.id);
     const refresh_token = await this.createTokenForRefresh(user.id);
@@ -63,4 +67,20 @@ export class AuthService {
     const token = await this.jwtService.signAsync({ userId });
     return token;
   }
+
+
+  async findOrCreateGoogleUser(profile: any): Promise<User> {
+    const user = await this.usersService.findOrCreateGoogleUser(profile);
+    return user;
+  }
+
+
+  async getJwtPayloadFromRefreshToken(refreshToken: string): Promise<JwtPayload> {
+   const decode = this.jwtService.decode(refreshToken);
+    if (!decode) {
+      throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
+    }
+    return decode as JwtPayload;
+  }
+  
 }

@@ -7,8 +7,21 @@ import { Experiment } from 'src/experiments/entities/experiments.entity';
 export class User extends BaseAbstractEntity {
   @Column({ unique: true })
   email: string;
-  @Column({ select: false })
-  password: string;
+
+  @Column({ select: false, nullable: true })
+  password?: string;
+
+  @Column({ unique: true, nullable: true })
+  googleId?: string;
+
+  @Column({ nullable: true })
+  firstName?: string;
+
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
 
   @Column({ default: false })
   darkMode: boolean;

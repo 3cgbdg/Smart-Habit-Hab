@@ -4,14 +4,20 @@ import { useQuery } from "@tanstack/react-query"
 import habitsService from "@/services/HabitsService"
 import { useParams } from "next/navigation"
 import HabitForm from "@/components/habits/HabitForm"
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const Page = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
     const { id } = useParams() as { id: string };
 
 
 
     const { data: habit, isLoading } = useQuery({
-        queryKey: ['habit', id],
+        queryKey: ['habit', id, userId],
+
         queryFn: async () => {
             const res = await habitsService.getHabitById(id);
             return res.data;

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { DataSource, MoreThan, Repository } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';

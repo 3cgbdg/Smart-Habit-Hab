@@ -18,8 +18,13 @@ import { useState, useEffect } from "react";
 import ExperimentForm from "@/components/experiments/ExperimentForm";
 import ExperimentDetailStats from "@/components/experiments/ExperimentDetailStats";
 import ExperimentDetailInfo from "@/components/experiments/ExperimentDetailInfo";
+import { useAppSelector } from "@/hooks/reduxHooks";
+
 
 const ExperimentDetailsPage = () => {
+    const user = useAppSelector(state => state.profile.user);
+    const userId = user?.id;
+
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
@@ -34,7 +39,8 @@ const ExperimentDetailsPage = () => {
     }, []);
 
     const { data: experiment, isLoading, refetch } = useQuery({
-        queryKey: ['experiment', id],
+        queryKey: ['experiment', id, userId],
+
         queryFn: async () => { const res = await experimentsService.getExperimentById(id); return res.data; },
         enabled: !!id,
     });

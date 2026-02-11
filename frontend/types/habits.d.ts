@@ -24,3 +24,17 @@ interface IHabitFormProps {
     mode: 'create' | 'update';
     initialData?: IHabit;
 }
+
+
+
+interface IHabitMonthlyRawStats {
+    habitId: string;
+    total: string;
+    completed: string;
+}
+
+interface IWeeklyRawStats {
+    date: Date;
+    completedCount: string;
+    missedCount?: string;
+}
