@@ -54,7 +54,7 @@ const AuthClientUpload = () => {
   }, [profileState.error, router]);
 
   if (profileState.loading) {
-    <FullSreenLoader />;
+    return <FullSreenLoader />;
   }
 
   return null;

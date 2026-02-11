@@ -7,6 +7,7 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("MainLayout rendering...");
   return (
     <div className="flex flex-col h-screen relative _container">
       <AuthClientUpload />
