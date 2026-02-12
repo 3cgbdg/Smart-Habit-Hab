@@ -13,7 +13,10 @@ import { DateUtils } from 'src/utils/date.util';
 import { BatchUtils } from 'src/utils/batch.util';
 import { PaginationUtils } from 'src/utils/pagination.util';
 import { StreakService } from './streak.service';
-import { HABIT_SELECT_FIELDS, HABIT_RELEVANT_SELECT_FIELDS } from './habits.constants';
+import {
+  HABIT_SELECT_FIELDS,
+  HABIT_RELEVANT_SELECT_FIELDS,
+} from './habits.constants';
 
 @Injectable()
 export class HabitsService {
@@ -23,7 +26,7 @@ export class HabitsService {
     private readonly habitLogsService: HabitLogsService,
     private readonly analysisService: AnalysisService,
     private readonly streakService: StreakService,
-  ) { }
+  ) {}
 
   // creating habit
   async create(
@@ -51,7 +54,11 @@ export class HabitsService {
       .select(HABIT_SELECT_FIELDS)
       .orderBy(`habit.${sortBy}`, order);
 
-    const { items: habits, total } = await PaginationUtils.paginate(qb, page, itemsPerPage);
+    const { items: habits, total } = await PaginationUtils.paginate(
+      qb,
+      page,
+      itemsPerPage,
+    );
 
     const habitIds = habits.map((h) => h.id);
 
@@ -122,12 +129,7 @@ export class HabitsService {
   ): Promise<ReturnDataType<Habit>> {
     const habit = await this.getHabitOrThrow(id, userId);
 
-    habit.name = dto.name;
-    habit.description = dto.description;
-
-    if (dto.isActive !== undefined) {
-      habit.isActive = dto.isActive;
-    }
+    Object.assign(habit, dto);
 
     return { data: await this.habitRepository.save(habit) };
   }
@@ -137,11 +139,12 @@ export class HabitsService {
     const today = DateUtils.getTodayDateString();
 
     await BatchUtils.processInBatches(
-      (lastId) => this.habitRepository.find({
-        take: OPTIMIZATION_CONSTANTS.BATCH_SIZE,
-        where: lastId ? { id: MoreThan(lastId) } : {},
-        order: { id: 'ASC' },
-      }),
+      (lastId) =>
+        this.habitRepository.find({
+          take: OPTIMIZATION_CONSTANTS.BATCH_SIZE,
+          where: lastId ? { id: MoreThan(lastId) } : {},
+          order: { id: 'ASC' },
+        }),
       async (habits) => {
         const habitLogs = habits.map((habit) => ({
           habitId: habit.id,
@@ -149,7 +152,7 @@ export class HabitsService {
           status: Status.PENDING,
         }));
         await this.habitLogsService.createBulk(habitLogs);
-      }
+      },
     );
   }
 

@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { GeneralAuthDto } from './dto/general-auth.dto';
 import * as bcrypt from 'bcryptjs';
@@ -20,10 +19,11 @@ import { JwtPayload } from 'src/types/auth';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async signup(
     dto: GeneralAuthDto,
@@ -31,7 +31,10 @@ export class AuthService {
     // hashing password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    const userId = await this.usersService.createAndReturnUserId(dto.email, hashedPassword);
+    const userId = await this.usersService.createAndReturnUserId(
+      dto.email,
+      hashedPassword,
+    );
 
     const access_token = await this.createTokenForAccess(userId);
     const refresh_token = await this.createTokenForRefresh(userId);
@@ -41,7 +44,7 @@ export class AuthService {
   async login(
     dto: GeneralAuthDto,
   ): Promise<{ access_token: string; refresh_token: string }> {
-    const user = await this.usersService.returnUserPassAndId(dto.email);
+    const user = await this.usersService.findByEmailWithPassword(dto.email);
     const isGood = await bcrypt.compare(dto.password, user.password ?? '');
     if (!isGood) throw new InternalServerErrorException();
     const access_token = await this.createTokenForAccess(user.id);
@@ -49,16 +52,18 @@ export class AuthService {
     return { access_token, refresh_token };
   }
 
-
   async createTokenForAccess(userId: string): Promise<string> {
     const token = await this.jwtService.signAsync({ userId });
     return token;
   }
   async createTokenForRefresh(userId: string): Promise<string> {
-    const token = await this.jwtService.signAsync({ userId }, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: '7d',
-    });
+    const token = await this.jwtService.signAsync(
+      { userId },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '7d',
+      },
+    );
     return token;
   }
 
@@ -68,23 +73,32 @@ export class AuthService {
     return token;
   }
 
-
-  async findOrCreateGoogleUser(profile: any): Promise<User> {
+  async findOrCreateGoogleUser(profile: {
+    id?: string;
+    sub?: string;
+    emails?: { value: string }[];
+    email?: string;
+    name?: { givenName?: string; familyName?: string };
+    given_name?: string;
+    family_name?: string;
+    photos?: { value: string }[];
+    picture?: string;
+  }): Promise<User> {
     const user = await this.usersService.findOrCreateGoogleUser(profile);
     return user;
   }
 
-
-  async getJwtPayloadFromRefreshToken(refreshToken: string): Promise<JwtPayload> {
-    const decode = this.jwtService.decode(refreshToken);
+  getJwtPayloadFromRefreshToken(refreshToken: string): JwtPayload {
+    const decode = this.jwtService.decode<JwtPayload>(refreshToken);
     if (!decode) {
       throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
-    return decode as JwtPayload;
+    return decode;
   }
 
-  async verifyGoogleToken(token: string): Promise<any> {
-    const client = new (await import('google-auth-library')).OAuth2Client(
+  async verifyGoogleToken(token: string): Promise<Record<string, any>> {
+    const { OAuth2Client } = await import('google-auth-library');
+    const client = new OAuth2Client(
       this.configService.get<string>('GOOGLE_CLIENT_ID'),
     );
     try {
@@ -92,8 +106,16 @@ export class AuthService {
         idToken: token,
         audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
-      return ticket.getPayload();
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new HttpException(
+          'Invalid Google token',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      return payload as unknown as Record<string, unknown>;
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       console.error('Google token verification failed:', error);
       throw new HttpException('Invalid Google token', HttpStatus.UNAUTHORIZED);
     }

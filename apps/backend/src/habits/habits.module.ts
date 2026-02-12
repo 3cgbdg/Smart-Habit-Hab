@@ -13,4 +13,4 @@ import { StreakService } from './streak.service';
   controllers: [HabitsController],
   providers: [HabitsService, HabitCron, StreakService],
 })
-export class HabitsModule { }
+export class HabitsModule {}

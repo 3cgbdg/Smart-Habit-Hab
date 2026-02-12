@@ -19,7 +19,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly cookiesService: CookiesService,
-  ) { }
+  ) {}
 
   @Post('google')
   async googleAuth(
@@ -47,7 +47,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<IReturnMessage> {
     const response = await this.authService.signup(dto);
-    this.cookiesService.setCookies(res, response.access_token, response.refresh_token);
+    this.cookiesService.setCookies(
+      res,
+      response.access_token,
+      response.refresh_token,
+    );
     return { message: 'Successfully signed up!' };
   }
 
@@ -57,7 +61,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<IReturnMessage> {
     const response = await this.authService.login(dto);
-    this.cookiesService.setCookies(res, response.access_token, response.refresh_token);
+    this.cookiesService.setCookies(
+      res,
+      response.access_token,
+      response.refresh_token,
+    );
     return { message: 'Successfully logged in!' };
   }
 
@@ -72,8 +80,11 @@ export class AuthController {
     if (!refreshToken) {
       throw new HttpException('No refresh token', HttpStatus.UNAUTHORIZED);
     }
-    const decode = await this.authService.getJwtPayloadFromRefreshToken(refreshToken);
-    const newAccessToken = await this.authService.createTokenForAccess(decode.userId);
+    const decode =
+      await this.authService.getJwtPayloadFromRefreshToken(refreshToken);
+    const newAccessToken = await this.authService.createTokenForAccess(
+      decode.userId,
+    );
     this.cookiesService.setAccessCookie(res, newAccessToken);
     return { message: 'Access token refreshed' };
   }

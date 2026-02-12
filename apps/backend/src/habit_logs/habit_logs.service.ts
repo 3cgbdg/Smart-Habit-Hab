@@ -6,13 +6,12 @@ import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
 import { DateUtils } from 'src/utils/date.util';
 import { BatchUtils } from 'src/utils/batch.util';
 
-
 @Injectable()
 export class HabitLogsService {
   constructor(
     @InjectRepository(HabitLog)
     private readonly habitLogRepository: Repository<HabitLog>,
-  ) { }
+  ) {}
 
   // create habit log
   async create(habitId: string, date: string, status: Status) {
@@ -75,14 +74,15 @@ export class HabitLogsService {
     const today = DateUtils.getTodayDateString();
 
     await BatchUtils.processRemainingInBatches(
-      () => this.habitLogRepository
-        .createQueryBuilder('log')
-        .select('log.id')
-        .where('log.date < :today', { today })
-        .andWhere('log.status = :status', { status: Status.PENDING })
-        .orderBy('log.date', 'ASC')
-        .limit(OPTIMIZATION_CONSTANTS.BATCH_SIZE)
-        .getRawMany<{ id: string }>(),
+      () =>
+        this.habitLogRepository
+          .createQueryBuilder('log')
+          .select('log.id')
+          .where('log.date < :today', { today })
+          .andWhere('log.status = :status', { status: Status.PENDING })
+          .orderBy('log.date', 'ASC')
+          .limit(OPTIMIZATION_CONSTANTS.BATCH_SIZE)
+          .getRawMany<{ id: string }>(),
       async (rawIds) => {
         const ids = rawIds.map((i) => i.id);
         await this.habitLogRepository
@@ -91,7 +91,7 @@ export class HabitLogsService {
           .set({ status: Status.SKIPPED })
           .whereInIds(ids)
           .execute();
-      }
+      },
     );
   }
 }

@@ -4,6 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { IQuoteResponse } from 'src/types/quotes';
+import { QUOTES_CONSTANTS } from '../../constants/quotes';
 
 @Injectable()
 export class ZenQuotesClient {
@@ -14,7 +15,9 @@ export class ZenQuotesClient {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.apiUrl = this.configService.get<string>('QUOTES_API_URL') || 'https://zenquotes.io/api';
+    this.apiUrl =
+      this.configService.get<string>('QUOTES_API_URL') ||
+      QUOTES_CONSTANTS.BASE_URL;
   }
 
   async fetchRandomQuote(): Promise<IQuoteResponse> {
@@ -24,7 +27,8 @@ export class ZenQuotesClient {
       );
       return data;
     } catch (error) {
-      this.logger.error(`Failed to call ZenQuotes: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to call ZenQuotes: ${message}`);
       throw error;
     }
   }

@@ -22,10 +22,7 @@ export enum ExperimentStatus {
 @Index('idx_experiments_status', ['status'])
 @Index('idx_experiments_start_date', ['startDate'])
 @Index('idx_experiments_end_date', ['endDate'])
-
-
 export class Experiment extends BaseAbstractEntity {
-
   @ManyToOne(() => User, (user) => user.experiments, {
     onDelete: 'CASCADE',
   })
@@ -60,6 +57,4 @@ export class Experiment extends BaseAbstractEntity {
     default: ExperimentStatus.PLANNED,
   })
   status: ExperimentStatus;
-
-
 }

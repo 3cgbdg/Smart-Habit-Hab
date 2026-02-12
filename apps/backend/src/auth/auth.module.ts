@@ -12,4 +12,4 @@ import { CookiesService } from './cookies.service';
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, CookiesService],
 })
-export class AuthModule { }
+export class AuthModule {}

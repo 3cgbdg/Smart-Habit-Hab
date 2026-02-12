@@ -10,7 +10,7 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 export class ProfilesService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async getOwnProfile(myId: string) {
     return this.userRepository.findOne({

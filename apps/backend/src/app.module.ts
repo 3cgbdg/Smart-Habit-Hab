@@ -48,9 +48,9 @@ import { AnalysisModule } from './analysis/analysis.module';
     ProfilesModule,
     QuotesModule,
     HabitLogsModule,
-    AnalysisModule
+    AnalysisModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

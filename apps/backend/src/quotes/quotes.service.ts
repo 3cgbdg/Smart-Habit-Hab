@@ -7,7 +7,7 @@ import { ZenQuotesClient } from './clients/zenquotes.client';
 
 @Injectable()
 export class QuotesService {
-  constructor(private readonly zenQuotesClient: ZenQuotesClient) { }
+  constructor(private readonly zenQuotesClient: ZenQuotesClient) {}
   async getRandomQuote() {
     try {
       const response = await this.zenQuotesClient.fetchRandomQuote();

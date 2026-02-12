@@ -4,11 +4,11 @@ import { Repository } from 'typeorm';
 import { Experiment } from './entities/experiments.entity';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
 import { IReturnMessage, ReturnDataType } from 'src/types/common';
-import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { EXPERIMENT_CONSTANTS } from '../constants/experiments';
 
 import { AnalysisService } from 'src/analysis/analysis.service';
 import { DateUtils } from 'src/utils/date.util';
+import { AnalyticsUtils } from 'src/utils/analytics.util';
 
 @Injectable()
 export class ExperimentsService {
@@ -16,7 +16,7 @@ export class ExperimentsService {
     @InjectRepository(Experiment)
     private readonly experimentRepository: Repository<Experiment>,
     private readonly analysisService: AnalysisService,
-  ) { }
+  ) {}
 
   async createExperiment(
     userId: string,
@@ -35,7 +35,7 @@ export class ExperimentsService {
     page: number,
     itemsPerPage: number,
     analytics: boolean,
-  ): Promise<ReturnDataType<{ data: any[]; total: number }>> {
+  ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
     const limit = !analytics
       ? EXPERIMENT_CONSTANTS.MAX_LIMIT < itemsPerPage
         ? EXPERIMENT_CONSTANTS.MAX_LIMIT
@@ -59,7 +59,8 @@ export class ExperimentsService {
       endDate: exp.endDate || today,
     }));
 
-    const successRates = await this.analysisService.getBulkSuccessRates(successRatesQueries);
+    const successRates =
+      await this.analysisService.getBulkSuccessRates(successRatesQueries);
 
     const dataWithSuccessRate = experiments.map((exp) => {
       const successRate = successRates[exp.habitId] || 0;
@@ -67,7 +68,8 @@ export class ExperimentsService {
         ...exp,
         successRate,
         ...(analytics && {
-          consistencyBoost: Math.floor(Math.random() * 15) + 5,
+          consistencyBoost:
+            AnalyticsUtils.calculatePlaceholderConsistencyBoost(),
         }),
       };
     });
