@@ -1,4 +1,0 @@
-export const EXPERIMENT_CONSTANTS = {
-    MAX_ANALYTICS_LIMIT: 4,
-    MAX_LIMIT: 4,
-}
