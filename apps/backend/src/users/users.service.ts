@@ -30,9 +30,7 @@ export class UsersService {
     const imageUrl = profile.photos ? profile.photos[0].value : profile.picture;
 
     if (!email) {
-      throw new InternalServerErrorException(
-        'Google profile must include an email',
-      );
+      throw new InternalServerErrorException('Google profile must include an email');
     }
 
     let user = await this.userRepository.findOne({
@@ -87,10 +85,7 @@ export class UsersService {
     return { password: user.password, id: user.id };
   }
 
-  async createAndReturnUserId(
-    email: string,
-    password: string,
-  ): Promise<string> {
+  async createAndReturnUserId(email: string, password: string): Promise<string> {
     const user = await this.userRepository.save({
       email,
       password,

@@ -15,9 +15,7 @@ export class ZenQuotesClient {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.apiUrl =
-      this.configService.get<string>('QUOTES_API_URL') ||
-      QUOTES_CONSTANTS.BASE_URL;
+    this.apiUrl = this.configService.get<string>('QUOTES_API_URL') || QUOTES_CONSTANTS.BASE_URL;
   }
 
   async fetchRandomQuote(): Promise<IQuoteResponse> {

@@ -37,12 +37,7 @@ export class ExperimentsController {
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('analytics') analytics: boolean,
   ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
-    return this.experimentsService.findMyExperiments(
-      req.user.id,
-      page,
-      itemsPerPage,
-      analytics,
-    );
+    return this.experimentsService.findMyExperiments(req.user.id, page, itemsPerPage, analytics);
   }
 
   @Get('latest')
@@ -71,10 +66,7 @@ export class ExperimentsController {
   }
 
   @Delete(':id')
-  async remove(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-  ): Promise<IReturnMessage> {
+  async remove(@Req() req: AuthRequest, @Param('id') id: string): Promise<IReturnMessage> {
     return this.experimentsService.remove(req.user.id, id);
   }
 }

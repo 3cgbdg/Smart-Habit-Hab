@@ -18,11 +18,7 @@ export const DateUtils = {
   },
   getLastDayOfMonthDateString: () => {
     const today = new Date();
-    const lastDayOfMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      0,
-    )
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
       .toISOString()
       .split('T')[0];
     return lastDayOfMonth;

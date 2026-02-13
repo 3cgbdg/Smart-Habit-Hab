@@ -1,13 +1,13 @@
-import AuthClientUpload from "@/components/layout/AuthClientUpload";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import AuthClientUpload from '@/components/layout/AuthClientUpload';
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
 
 export default async function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log("MainLayout rendering...");
+  console.log('MainLayout rendering...');
   return (
     <div className="flex flex-col h-screen relative _container">
       <AuthClientUpload />

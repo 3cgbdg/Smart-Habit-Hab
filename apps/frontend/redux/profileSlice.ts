@@ -1,19 +1,19 @@
-import ProfilesService from "@/services/ProfilesService";
-import { IUser } from "@/types/profiles";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
+import ProfilesService from '@/services/ProfilesService';
+import { IUser } from '@/types/profiles';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 
 // thunk
 export const fetchProfile = createAsyncThunk(
-  "user/fetchProfile",
+  'user/fetchProfile',
   async (_, { rejectWithValue }) => {
     try {
       const user: IUser = await ProfilesService.getOwnProfile();
       return user;
     } catch {
-      return rejectWithValue("Unauthorized");
+      return rejectWithValue('Unauthorized');
     }
-  }
+  },
 );
 
 interface IinitialState {
@@ -29,7 +29,7 @@ const initialState: IinitialState = {
 };
 
 const profileSlice = createSlice({
-  name: "profile",
+  name: 'profile',
   initialState,
   reducers: {
     getProfile: (state, action: PayloadAction<IUser>) => {
@@ -38,7 +38,6 @@ const profileSlice = createSlice({
     logOut: (state) => {
       state.user = null;
     },
-
   },
   extraReducers: (builder) => {
     builder
@@ -51,18 +50,12 @@ const profileSlice = createSlice({
         state.error = action.payload as string;
         toast.error(state.error);
       })
-      .addCase(
-        fetchProfile.fulfilled,
-        (state, action: PayloadAction<IUser>) => {
-          state.loading = false;
-          state.user = action.payload;
-        }
-      );
+      .addCase(fetchProfile.fulfilled, (state, action: PayloadAction<IUser>) => {
+        state.loading = false;
+        state.user = action.payload;
+      });
   },
 });
 
-export const {
-  getProfile,
-  logOut
-} = profileSlice.actions;
+export const { getProfile, logOut } = profileSlice.actions;
 export default profileSlice.reducer;

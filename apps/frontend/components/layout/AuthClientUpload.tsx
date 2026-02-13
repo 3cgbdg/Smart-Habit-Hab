@@ -1,9 +1,9 @@
-"use client";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import FullSreenLoader from "../FullSreenLoader";
-import { fetchProfile } from "@/redux/profileSlice";
+'use client';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import FullSreenLoader from '../FullSreenLoader';
+import { fetchProfile } from '@/redux/profileSlice';
 
 // fetching data component every reload
 const AuthClientUpload = () => {
@@ -33,7 +33,7 @@ const AuthClientUpload = () => {
           throw lastError;
         }
       } catch {
-        router.push("/auth/login");
+        router.push('/auth/login');
       }
     };
     getData();
@@ -41,15 +41,15 @@ const AuthClientUpload = () => {
 
   useEffect(() => {
     if (profileState.loading) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     }
   }, [profileState.loading]);
 
   useEffect(() => {
     if (profileState.error) {
-      router.push("/auth/login");
+      router.push('/auth/login');
     }
   }, [profileState.error, router]);
 

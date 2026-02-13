@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { HabitsService } from './habits.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHabitDto } from './dto/create-habit.dto';
@@ -38,19 +28,11 @@ export class HabitsController {
     @Query('sortBy') sortBy: string,
     @Query('order') order: 'ASC' | 'DESC' | undefined = 'ASC',
   ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
-    return this.habitsService.findMyHabits(
-      req.user.id,
-      page,
-      itemsPerPage,
-      sortBy,
-      order,
-    );
+    return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
   }
 
   @Get('relevant')
-  async findRelevantHabits(
-    @Req() req: AuthRequest,
-  ): Promise<ReturnDataType<Habit[]>> {
+  async findRelevantHabits(@Req() req: AuthRequest): Promise<ReturnDataType<Habit[]>> {
     return this.habitsService.findRelevantHabits(req.user.id);
   }
 
@@ -71,16 +53,12 @@ export class HabitsController {
   }
 
   @Patch('/:habitId/complete')
-  async completeHabit(
-    @Param('habitId') habitId: string,
-  ): Promise<ReturnDataType<null>> {
+  async completeHabit(@Param('habitId') habitId: string): Promise<ReturnDataType<null>> {
     return this.habitsService.completeHabit(habitId);
   }
 
   @Patch('/:habitId/skip')
-  async skipHabit(
-    @Param('habitId') habitId: string,
-  ): Promise<ReturnDataType<null>> {
+  async skipHabit(@Param('habitId') habitId: string): Promise<ReturnDataType<null>> {
     return this.habitsService.skipHabit(habitId);
   }
 

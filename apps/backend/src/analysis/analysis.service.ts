@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from '../habit_logs/entities/habit_log.enitity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import {
-  IHabitMonthlyRawStats,
-  IWeeklyRawStats,
-  IWeekStats,
-} from 'src/types/habits';
+import { IHabitMonthlyRawStats, IWeeklyRawStats, IWeekStats } from 'src/types/habits';
 import { DateUtils } from 'src/utils/date.util';
 
 @Injectable()
@@ -16,26 +12,14 @@ export class AnalysisService {
     private readonly habitLogRepository: Repository<HabitLog>,
   ) {}
 
-  private addStatsSelection(
-    qb: SelectQueryBuilder<HabitLog>,
-    alias: string = 'log',
-  ) {
+  private addStatsSelection(qb: SelectQueryBuilder<HabitLog>, alias: string = 'log') {
     return qb
-      .addSelect(
-        `SUM(CASE WHEN ${alias}.status = :completed THEN 1 ELSE 0 END)`,
-        'completedCount',
-      )
+      .addSelect(`SUM(CASE WHEN ${alias}.status = :completed THEN 1 ELSE 0 END)`, 'completedCount')
       .setParameter('completed', Status.COMPLETED);
   }
 
-  async getSuccessRate(
-    habitId: string,
-    startDate: string,
-    endDate: string,
-  ): Promise<number> {
-    const rates = await this.getBulkSuccessRates([
-      { habitId, startDate, endDate },
-    ]);
+  async getSuccessRate(habitId: string, startDate: string, endDate: string): Promise<number> {
+    const rates = await this.getBulkSuccessRates([{ habitId, startDate, endDate }]);
     return rates[habitId] || 0;
   }
 
@@ -48,10 +32,7 @@ export class AnalysisService {
       .createQueryBuilder('log')
       .select('log.habitId', 'habitId')
       .addSelect('COUNT(*)', 'total')
-      .addSelect(
-        'SUM(CASE WHEN log.status = :completed THEN 1 ELSE 0 END)',
-        'completed',
-      )
+      .addSelect('SUM(CASE WHEN log.status = :completed THEN 1 ELSE 0 END)', 'completed')
       .setParameter('completed', Status.COMPLETED);
 
     queries.forEach((q, index) => {
@@ -66,7 +47,11 @@ export class AnalysisService {
       qb.setParameter(`eDate${index}`, q.endDate);
     });
 
-    const stats = await qb.groupBy('log.habitId').getRawMany();
+    const stats = await qb.groupBy('log.habitId').getRawMany<{
+      habitId: string;
+      total: string;
+      completed: string;
+    }>();
 
     const result: Record<string, number> = {};
     stats.forEach((s) => {
@@ -93,10 +78,7 @@ export class AnalysisService {
       .createQueryBuilder('log')
       .select('log.habitId', 'habitId')
       .addSelect('COUNT(*)', 'total')
-      .addSelect(
-        'SUM(CASE WHEN log.status = :status THEN 1 ELSE 0 END)',
-        'completed',
-      )
+      .addSelect('SUM(CASE WHEN log.status = :status THEN 1 ELSE 0 END)', 'completed')
       .where('log.date BETWEEN :firstDay AND :lastDay', { firstDay, lastDay })
       .andWhere('log.habitId IN (:...habitIds)', { habitIds })
       .setParameter('status', Status.COMPLETED)
@@ -117,10 +99,7 @@ export class AnalysisService {
     return result;
   }
 
-  async getWeeklyStats(
-    userId: string,
-    analytics: boolean,
-  ): Promise<IWeekStats> {
+  async getWeeklyStats(userId: string, analytics: boolean): Promise<IWeekStats> {
     const todayStr = DateUtils.getTodayDateString();
     const sevenDaysAgoStr = DateUtils.getSevenDaysAgoDateString();
 
@@ -150,9 +129,7 @@ export class AnalysisService {
     const statsLookup = statsRaw.reduce(
       (acc, row) => {
         const dateStr =
-          row.date instanceof Date
-            ? row.date.toISOString().split('T')[0]
-            : String(row.date);
+          row.date instanceof Date ? row.date.toISOString().split('T')[0] : String(row.date);
         acc[dateStr] = {
           completed: parseInt(row.completedCount) || 0,
           missed: analytics ? parseInt(row.missedCount || '0') || 0 : 0,
