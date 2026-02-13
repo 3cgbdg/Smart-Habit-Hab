@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import habitsService from '@/services/HabitsService';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import HabitCard from '@/components/dashboard/HabitCard';
 import { Button, Pagination, Box, Typography } from '@mui/material';
@@ -11,6 +11,15 @@ import { PlusIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
 const Page = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -53,6 +62,8 @@ const Page = () => {
     () => (habitsData ? Math.ceil(habitsData.total / itemsPerPage) : 0),
     [habitsData],
   );
+  if (!isHydrated) return null;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex  gap-6 justify-between items-center">

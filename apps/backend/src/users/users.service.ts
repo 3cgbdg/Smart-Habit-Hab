@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async findOrCreateGoogleUser(profile: {
     id?: string;
@@ -28,6 +28,8 @@ export class UsersService {
     const firstName = profile.name?.givenName || profile.given_name;
     const lastName = profile.name?.familyName || profile.family_name;
     const imageUrl = profile.photos ? profile.photos[0].value : profile.picture;
+
+    console.log('Google Profile Image URL:', imageUrl);
 
     if (!email) {
       throw new InternalServerErrorException('Google profile must include an email');

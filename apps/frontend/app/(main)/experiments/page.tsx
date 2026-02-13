@@ -22,6 +22,8 @@ import { Pagination } from '@mui/material';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
 const Page = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
+
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -31,6 +33,13 @@ const Page = () => {
 
   const page = Number(searchParams.get('page')) || 1;
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
   useEffect(() => {
     if (!searchParams.get('page')) {
@@ -68,6 +77,8 @@ const Page = () => {
     () => (experimentsData ? Math.ceil(experimentsData.total / itemsPerPage) : 0),
     [experimentsData],
   );
+
+  if (!isHydrated) return null;
 
   return (
     <Box sx={{ p: 1 }}>

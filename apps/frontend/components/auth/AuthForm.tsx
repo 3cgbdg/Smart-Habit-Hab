@@ -115,7 +115,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             onError={() => {
               toast.error('Google Login Failed');
             }}
-            useOneTap
+            // useOneTap
             text={isLogin ? 'signin_with' : 'signup_with'}
             width="400"
           />

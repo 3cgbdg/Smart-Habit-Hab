@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import habitsService from '@/services/HabitsService';
 import experimentsService from '@/services/ExperimentsService';
@@ -12,6 +12,15 @@ import ExperimentImpact from '@/components/analytics/ExperimentImpact';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
 const AnalyticsPage = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -77,6 +86,8 @@ const AnalyticsPage = () => {
       return "You're on the right track! Keeping your habits above 50% helps build long-term momentum.";
     return 'Keep going! Focus on one habit at a time to improve your daily consistency.';
   }, [habitsData]);
+
+  if (!isHydrated) return null;
 
   return (
     <div className="flex flex-col gap-10 pb-10">

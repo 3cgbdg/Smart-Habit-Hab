@@ -5,8 +5,18 @@ import habitsService from '@/services/HabitsService';
 import { useParams } from 'next/navigation';
 import HabitForm from '@/components/habits/HabitForm';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import { useState, useEffect } from 'react';
 
 const Page = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -20,6 +30,8 @@ const Page = () => {
       return res.data;
     },
   });
+
+  if (!isHydrated) return null;
 
   if (isLoading) return <div className="p-10 text-center">Loading habit details...</div>;
 

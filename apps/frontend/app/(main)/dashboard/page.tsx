@@ -4,7 +4,7 @@ import habitsService from '@/services/HabitsService';
 import quoteService from '@/services/QuoteService';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TodayHabits from '@/components/dashboard/TodayHabits';
 import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
 import DailyInspiration from '@/components/dashboard/DailyInspiration';
@@ -13,6 +13,15 @@ import experimentsService from '@/services/ExperimentsService';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
 const Page = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -104,6 +113,8 @@ const Page = () => {
     }
   }, [isExperimentsError, experimentsError]);
   /////
+
+  if (!isHydrated) return null;
 
   return (
     <div className="flex flex-col gap-6">
