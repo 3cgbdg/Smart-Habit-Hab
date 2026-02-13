@@ -21,6 +21,8 @@ import ExperimentCard from '@/components/experiments/ExperimentCard';
 import { Pagination } from '@mui/material';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
+import { Suspense } from 'react';
+
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -175,4 +177,10 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default function ExperimentsPage() {
+  return (
+    <Suspense fallback={<Box sx={{ p: 4, color: 'text.secondary' }}>Loading experiments...</Box>}>
+      <Page />
+    </Suspense>
+  );
+}

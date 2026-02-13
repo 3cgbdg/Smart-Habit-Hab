@@ -10,6 +10,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
+import { Suspense } from 'react';
+
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -120,4 +122,10 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default function HabitsPage() {
+  return (
+    <Suspense fallback={<Box sx={{ p: 4, color: 'text.secondary' }}>Loading habits...</Box>}>
+      <Page />
+    </Suspense>
+  );
+}

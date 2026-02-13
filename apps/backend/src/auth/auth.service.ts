@@ -89,7 +89,7 @@ export class AuthService {
     return decode;
   }
 
-  async verifyGoogleToken(token: string): Promise<Record<string, any>> {
+  async verifyGoogleToken(token: string): Promise<Record<string, unknown>> {
     const { OAuth2Client } = await import('google-auth-library');
     const client = new OAuth2Client(this.configService.get<string>('GOOGLE_CLIENT_ID'));
     try {
