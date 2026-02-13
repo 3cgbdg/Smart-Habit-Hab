@@ -1,10 +1,4 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { AuthFormSchema } from '@smart-habit/shared';
 
-export class GeneralAuthDto {
-  @IsEmail()
-  email: string;
-  @IsString()
-  @MinLength(8)
-  @MaxLength(32)
-  password: string;
-}
+export class GeneralAuthDto extends createZodDto(AuthFormSchema) { }

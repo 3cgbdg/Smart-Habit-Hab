@@ -1,5 +1,7 @@
-import { ApiResponse, IUser, IUpdateProfilePayload } from '@/types/general';
+import { ApiResponse } from '@/types/general';
+import { IUser } from '@/types/profiles';
 import { api } from './axiosInstance';
+import { UpdateProfileInput } from '@smart-habit/shared';
 
 class ProfilesService {
   async getOwnProfile(): Promise<IUser> {
@@ -8,7 +10,7 @@ class ProfilesService {
     return response.data;
   }
 
-  async updateProfile(data: IUpdateProfilePayload): Promise<ApiResponse<null>> {
+  async updateProfile(data: UpdateProfileInput): Promise<ApiResponse<null>> {
     const response = await api.patch('/profiles/update', data);
     return response.data;
   }
