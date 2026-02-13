@@ -1,15 +1,15 @@
 import { ApiResponse } from '@/types/general';
 import { api } from './axiosInstance';
-import { ExperimentFormData } from '@/validation/ExperimentFormSchema';
+import { CreateExperimentInput } from '@smart-habit/shared';
 import { IExperiment } from '@/types/experiments';
 
 class ExperimentsService {
-  async createExperiment(data: ExperimentFormData): Promise<ApiResponse<null>> {
+  async createExperiment(data: CreateExperimentInput): Promise<ApiResponse<null>> {
     const res = await api.post('/experiments', data);
     return res.data;
   }
 
-  async updateExperiment(id: string, data: ExperimentFormData): Promise<ApiResponse<null>> {
+  async updateExperiment(id: string, data: CreateExperimentInput): Promise<ApiResponse<null>> {
     const res = await api.patch(`/experiments/${id}`, data);
     return res.data;
   }

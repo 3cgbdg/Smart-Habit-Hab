@@ -42,7 +42,7 @@ export class Experiment extends BaseAbstractEntity {
   startDate: string;
 
   @Column({ type: 'date', nullable: true })
-  endDate?: string;
+  endDate?: string | null;
 
   @Column({
     type: 'enum',
