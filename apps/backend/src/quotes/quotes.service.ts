@@ -1,8 +1,4 @@
-import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
-import { IQuoteResponse } from 'src/types/quotes';
-import { Logger } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ZenQuotesClient } from './clients/zenquotes.client';
 
 @Injectable()
@@ -17,7 +13,7 @@ export class QuotesService {
       return {
         data: { author: quote.a, content: quote.q },
       };
-    } catch (error) {
+    } catch {
       throw new HttpException('Quote service is temporarily unavailable', 500);
     }
   }

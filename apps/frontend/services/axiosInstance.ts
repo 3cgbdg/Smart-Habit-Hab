@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -12,18 +12,18 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalReq._retry &&
-      !originalReq.url.includes("/auth/refresh")
+      !originalReq.url.includes('/auth/refresh')
     ) {
       originalReq._retry = true;
       try {
         // Wait a bit before retrying to ensure backend is ready
         await new Promise((resolve) => setTimeout(resolve, 300));
-        await api.post("/auth/refresh");
+        await api.post('/auth/refresh');
         return api(originalReq);
       } catch (err) {
         return Promise.reject(err);
       }
-    } 
+    }
     return Promise.reject(error);
-  }
+  },
 );

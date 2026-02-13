@@ -6,8 +6,4 @@ export const HABIT_SELECT_FIELDS = [
   'habit.isActive',
 ];
 
-export const HABIT_RELEVANT_SELECT_FIELDS = [
-  'habit.id',
-  'habit.name',
-  'habit.streak',
-];
+export const HABIT_RELEVANT_SELECT_FIELDS = ['habit.id', 'habit.name', 'habit.streak'];

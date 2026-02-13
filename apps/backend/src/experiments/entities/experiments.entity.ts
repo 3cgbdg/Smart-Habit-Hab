@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  CreateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, Index } from 'typeorm';
 import { Habit } from 'src/habits/entities/habit.entity';
 import { User } from 'src/users/entities/user.entity';
 import { BaseAbstractEntity } from 'src/entities/base-abstract.enitity';

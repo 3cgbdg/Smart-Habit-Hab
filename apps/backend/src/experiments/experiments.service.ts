@@ -18,10 +18,7 @@ export class ExperimentsService {
     private readonly analysisService: AnalysisService,
   ) {}
 
-  async createExperiment(
-    userId: string,
-    dto: CreateExperimentDto,
-  ): Promise<IReturnMessage> {
+  async createExperiment(userId: string, dto: CreateExperimentDto): Promise<IReturnMessage> {
     const experiment = this.experimentRepository.create({
       ...dto,
       userId: userId,
@@ -59,8 +56,7 @@ export class ExperimentsService {
       endDate: exp.endDate || today,
     }));
 
-    const successRates =
-      await this.analysisService.getBulkSuccessRates(successRatesQueries);
+    const successRates = await this.analysisService.getBulkSuccessRates(successRatesQueries);
 
     const dataWithSuccessRate = experiments.map((exp) => {
       const successRate = successRates[exp.habitId] || 0;
@@ -68,8 +64,7 @@ export class ExperimentsService {
         ...exp,
         successRate,
         ...(analytics && {
-          consistencyBoost:
-            AnalyticsUtils.calculatePlaceholderConsistencyBoost(),
+          consistencyBoost: AnalyticsUtils.calculatePlaceholderConsistencyBoost(),
         }),
       };
     });
@@ -136,11 +131,7 @@ export class ExperimentsService {
     };
   }
 
-  async update(
-    userId: string,
-    id: string,
-    dto: CreateExperimentDto,
-  ): Promise<IReturnMessage> {
+  async update(userId: string, id: string, dto: CreateExperimentDto): Promise<IReturnMessage> {
     const experiment = await this.experimentRepository.findOne({
       where: { id, userId },
     });

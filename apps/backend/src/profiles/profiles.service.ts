@@ -8,9 +8,7 @@ import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class ProfilesService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
   async getOwnProfile(myId: string) {
     return this.userRepository.findOne({

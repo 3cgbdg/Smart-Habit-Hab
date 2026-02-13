@@ -25,25 +25,18 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async signup(
-    dto: GeneralAuthDto,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  async signup(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
     // hashing password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    const userId = await this.usersService.createAndReturnUserId(
-      dto.email,
-      hashedPassword,
-    );
+    const userId = await this.usersService.createAndReturnUserId(dto.email, hashedPassword);
 
     const access_token = await this.createTokenForAccess(userId);
     const refresh_token = await this.createTokenForRefresh(userId);
     return { access_token, refresh_token };
   }
 
-  async login(
-    dto: GeneralAuthDto,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  async login(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.usersService.findByEmailWithPassword(dto.email);
     const isGood = await bcrypt.compare(dto.password, user.password ?? '');
     if (!isGood) throw new InternalServerErrorException();
@@ -98,9 +91,7 @@ export class AuthService {
 
   async verifyGoogleToken(token: string): Promise<Record<string, any>> {
     const { OAuth2Client } = await import('google-auth-library');
-    const client = new OAuth2Client(
-      this.configService.get<string>('GOOGLE_CLIENT_ID'),
-    );
+    const client = new OAuth2Client(this.configService.get<string>('GOOGLE_CLIENT_ID'));
     try {
       const ticket = await client.verifyIdToken({
         idToken: token,
@@ -108,10 +99,7 @@ export class AuthService {
       });
       const payload = ticket.getPayload();
       if (!payload) {
-        throw new HttpException(
-          'Invalid Google token',
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw new HttpException('Invalid Google token', HttpStatus.UNAUTHORIZED);
       }
       return payload as unknown as Record<string, unknown>;
     } catch (error) {

@@ -13,10 +13,7 @@ import { DateUtils } from 'src/utils/date.util';
 import { BatchUtils } from 'src/utils/batch.util';
 import { PaginationUtils } from 'src/utils/pagination.util';
 import { StreakService } from './streak.service';
-import {
-  HABIT_SELECT_FIELDS,
-  HABIT_RELEVANT_SELECT_FIELDS,
-} from './habits.constants';
+import { HABIT_SELECT_FIELDS, HABIT_RELEVANT_SELECT_FIELDS } from './habits.constants';
 
 @Injectable()
 export class HabitsService {
@@ -29,10 +26,7 @@ export class HabitsService {
   ) {}
 
   // creating habit
-  async create(
-    userId: string,
-    dto: CreateHabitDto,
-  ): Promise<ReturnDataType<Habit>> {
+  async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
     const habit = this.habitRepository.create({
       ...dto,
       userId: userId,
@@ -54,11 +48,7 @@ export class HabitsService {
       .select(HABIT_SELECT_FIELDS)
       .orderBy(`habit.${sortBy}`, order);
 
-    const { items: habits, total } = await PaginationUtils.paginate(
-      qb,
-      page,
-      itemsPerPage,
-    );
+    const { items: habits, total } = await PaginationUtils.paginate(qb, page, itemsPerPage);
 
     const habitIds = habits.map((h) => h.id);
 
@@ -72,10 +62,7 @@ export class HabitsService {
   }
 
   // getting havit by id
-  async findHabitById(
-    userId: string,
-    id: string,
-  ): Promise<ReturnDataType<Habit>> {
+  async findHabitById(userId: string, id: string): Promise<ReturnDataType<Habit>> {
     const habit = await this.getHabitOrThrow(id, userId);
     return { data: habit };
   }
@@ -97,10 +84,7 @@ export class HabitsService {
   }
 
   // weekly stats for all habits of user
-  async getWeeklyStats(
-    userId: string,
-    analytics: boolean,
-  ): Promise<ReturnDataType<IWeekStats>> {
+  async getWeeklyStats(userId: string, analytics: boolean): Promise<ReturnDataType<IWeekStats>> {
     const stats = await this.analysisService.getWeeklyStats(userId, analytics);
 
     return { data: stats };

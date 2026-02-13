@@ -7,13 +7,19 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "clean": "turbo clean"
+    "format": "turbo format",
+    "clean": "turbo clean",
+    "prepare": "husky"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "devDependencies": {
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.5",
+    "husky": "^9.1.7",
+    "prettier": "3.8.1",
     "turbo": "^2.0.0"
   }
 }
