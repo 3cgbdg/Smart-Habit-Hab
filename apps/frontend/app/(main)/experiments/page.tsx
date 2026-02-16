@@ -16,12 +16,10 @@ import { useQuery } from '@tanstack/react-query';
 import experimentsService from '@/services/ExperimentsService';
 import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, Suspense } from 'react';
 import ExperimentCard from '@/components/experiments/ExperimentCard';
 import { Pagination } from '@mui/material';
 import { useAppSelector } from '@/hooks/reduxHooks';
-
-import { Suspense } from 'react';
 
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);

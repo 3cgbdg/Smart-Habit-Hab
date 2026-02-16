@@ -1,8 +1,11 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -22,12 +25,11 @@ export class UsersService {
     photos?: { value: string }[];
     picture?: string;
   }): Promise<User> {
-    // Map fields from either Passport profile OR Google ID Token payload
     const googleId = profile.id || profile.sub;
-    const email = profile.emails ? profile.emails[0].value : profile.email;
+    const email = profile.emails?.[0]?.value || profile.email;
     const firstName = profile.name?.givenName || profile.given_name;
     const lastName = profile.name?.familyName || profile.family_name;
-    const imageUrl = profile.photos ? profile.photos[0].value : profile.picture;
+    const imageUrl = profile.photos?.[0]?.value || profile.picture;
 
     console.log('Google Profile Image URL:', imageUrl);
 
@@ -39,26 +41,23 @@ export class UsersService {
       where: [{ googleId }, { email }],
     });
 
-    if (user) {
-      if (!user.googleId) {
-        user.googleId = googleId;
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.imageUrl = imageUrl;
-        await this.userRepository.save(user);
-      }
-      return user;
+    if (!user) {
+      user = this.userRepository.create({
+        googleId,
+        email,
+        firstName,
+        lastName,
+        imageUrl,
+      });
+      return this.userRepository.save(user);
     }
 
-    user = this.userRepository.create({
-      googleId,
-      email,
-      firstName,
-      lastName,
-      imageUrl,
-    });
+    if (!user.googleId) {
+      Object.assign(user, { googleId, firstName, lastName, imageUrl });
+      await this.userRepository.save(user);
+    }
 
-    return this.userRepository.save(user);
+    return user;
   }
 
   async findById(id: string): Promise<User | null> {

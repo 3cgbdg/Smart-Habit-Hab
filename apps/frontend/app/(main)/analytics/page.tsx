@@ -33,7 +33,6 @@ const AnalyticsPage = () => {
 
     queryFn: async () => {
       const data = await habitsService.getWeeklyStats(true);
-      console.log(data);
       return data.data;
     },
     staleTime: 60 * 1000,

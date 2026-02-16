@@ -2,15 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 import habitsService from '@/services/HabitsService';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import { toast } from 'react-toastify';
 import HabitCard from '@/components/dashboard/HabitCard';
 import { Button, Pagination, Box, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/reduxHooks';
-
-import { Suspense } from 'react';
 
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -35,6 +33,7 @@ const Page = () => {
       router.replace('/habits?page=1');
     }
   }, [searchParams, router]);
+
   const {
     data: habitsData,
     isError: isHabitsError,
@@ -52,7 +51,7 @@ const Page = () => {
 
   useEffect(() => {
     if (isHabitsError && habitsError) {
-      toast.error(habitsError.message);
+      toast.error(habitsError.message || 'Error fetching habits');
     }
   }, [isHabitsError, habitsError]);
 
@@ -64,11 +63,12 @@ const Page = () => {
     () => (habitsData ? Math.ceil(habitsData.total / itemsPerPage) : 0),
     [habitsData],
   );
+
   if (!isHydrated) return null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex  gap-6 justify-between items-center">
+      <div className="flex gap-6 justify-between items-center">
         <h1 className="page-title">All Habits</h1>
         <Button
           sx={{ borderRadius: 10, gap: 0.5, fontWeight: 600 }}
@@ -96,16 +96,13 @@ const Page = () => {
           </Typography>
         </Box>
       ) : (
-        <>
-          {' '}
-          <div className="grid grid-cols-3 gap-4">
-            {habitsData?.habits?.map((h) => (
-              <div key={h.id} className="">
-                <HabitCard type="all" habit={h} />
-              </div>
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-3 gap-4">
+          {habitsData?.habits?.map((h) => (
+            <div key={h.id} className="">
+              <HabitCard type="all" habit={h} />
+            </div>
+          ))}
+        </div>
       )}
 
       {habitsData && habitsData.total > itemsPerPage && (
