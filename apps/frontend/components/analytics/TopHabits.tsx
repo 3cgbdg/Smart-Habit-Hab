@@ -1,11 +1,11 @@
 'use client';
 
 import { Typography, Box } from '@mui/material';
-import { IHabit } from '@/types/habits';
+import { Habit } from '@/types/habits';
 import AnalyticsHabitCard from './AnalyticsHabitCard';
 
 interface TopHabitsProps {
-  habits: IHabit[];
+  habits: Habit[];
 }
 
 const TopHabits = ({ habits }: TopHabitsProps) => {

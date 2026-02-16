@@ -2,9 +2,9 @@
 
 import { Card, CardContent, Typography } from '@mui/material';
 import { Flame, Trophy } from 'lucide-react';
-import { IHabit } from '@/types/habits';
+import { Habit } from '@/types/habits';
 
-const AnalyticsHabitCard = ({ habit }: { habit: IHabit }) => {
+const AnalyticsHabitCard = ({ habit }: { habit: Habit }) => {
   return (
     <Card
       className="shadow-xs border border-neutral-200"

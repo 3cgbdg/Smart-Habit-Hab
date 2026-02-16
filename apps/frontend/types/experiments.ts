@@ -6,7 +6,7 @@ export const ExperimentStatus = {
 
 export type ExperimentStatus = (typeof ExperimentStatus)[keyof typeof ExperimentStatus];
 
-export interface IExperiment {
+export interface Experiment {
   id: string;
   name: string;
   habitId?: string;
@@ -23,8 +23,8 @@ export interface IExperiment {
   consistencyBoost?: number;
 }
 
-export interface IExperimentFormProps {
+export interface ExperimentFormProps {
   mode: 'create' | 'update';
-  initialData?: IExperiment;
+  initialData?: Experiment;
   onSuccess: () => void;
 }

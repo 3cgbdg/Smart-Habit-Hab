@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import experimentsService from '@/services/ExperimentsService';
+import { ROUTES } from '@/constants/routes';
 import {
   Box,
   Typography,
@@ -65,7 +66,7 @@ const ExperimentDetailsPage = () => {
     return (
       <Box sx={{ textAlign: 'center', py: 10 }}>
         <Typography variant="h6">Experiment not found</Typography>
-        <Button variant="text" onClick={() => router.push('/experiments')} sx={{ mt: 2 }}>
+        <Button variant="text" onClick={() => router.push(ROUTES.EXPERIMENTS)} sx={{ mt: 2 }}>
           Go back to list
         </Button>
       </Box>
@@ -78,7 +79,7 @@ const ExperimentDetailsPage = () => {
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 6 }}>
         <Button
           startIcon={<ArrowLeft size={20} />}
-          onClick={() => router.push('/experiments')}
+          onClick={() => router.push(ROUTES.EXPERIMENTS)}
           sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}
         >
           Back to Experiments

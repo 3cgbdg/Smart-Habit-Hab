@@ -6,7 +6,7 @@ export type ApiResponse<T> = {
   errors?: string[];
 };
 
-export interface IUpdateProfilePayload {
+export interface UpdateProfilePayload {
   email?: string;
   newPassword?: string;
   currentPassword?: string;

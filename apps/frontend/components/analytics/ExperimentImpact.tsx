@@ -11,10 +11,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { IExperiment } from '@/types/experiments';
+import { Experiment } from '@/types/experiments';
 
 interface ExperimentImpactProps {
-  data: IExperiment[];
+  data: Experiment[];
 }
 
 const ExperimentImpact = ({ data }: ExperimentImpactProps) => {

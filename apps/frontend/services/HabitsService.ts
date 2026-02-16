@@ -1,16 +1,16 @@
 import { ApiResponse } from '@/types/general';
 import { api } from './axiosInstance';
-import { IHabit, IWeekStats } from '@/types/habits';
+import { Habit, WeekStats } from '@/types/habits';
 
 import { CreateHabitInput } from '@smart-habit/shared';
 
 export class HabitsService {
-  async getRelevantHabits(): Promise<ApiResponse<IHabit[]>> {
+  async getRelevantHabits(): Promise<ApiResponse<Habit[]>> {
     const response = await api.get('/habits/relevant');
     return response.data;
   }
 
-  async getWeeklyStats(analytics: boolean): Promise<ApiResponse<IWeekStats>> {
+  async getWeeklyStats(analytics: boolean): Promise<ApiResponse<WeekStats>> {
     const response = await api.get(`/habits/stats/weekly?analytics=${analytics}`);
     return response.data;
   }
@@ -30,7 +30,7 @@ export class HabitsService {
     itemsPerPage: number,
     sortBy?: string,
     order?: string,
-  ): Promise<ApiResponse<{ habits: IHabit[]; total: number }>> {
+  ): Promise<ApiResponse<{ habits: Habit[]; total: number }>> {
     const response = await api.get('/habits/my', {
       params: {
         page,
@@ -42,7 +42,7 @@ export class HabitsService {
     return response.data;
   }
 
-  async getHabitById(habitId: string): Promise<ApiResponse<IHabit>> {
+  async getHabitById(habitId: string): Promise<ApiResponse<Habit>> {
     const response = await api.get(`/habits/${habitId}`);
     return response.data;
   }

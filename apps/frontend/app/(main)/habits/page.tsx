@@ -9,6 +9,8 @@ import { Button, Pagination, Box, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import { ROUTES } from '@/constants/routes';
+import { ITEMS_PER_PAGE, DEFAULT_PAGE } from '@/constants/pagination';
 
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -25,12 +27,12 @@ const Page = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
-  const itemsPerPage = 10;
+  const page = Number(searchParams.get('page')) || DEFAULT_PAGE;
+  const itemsPerPage = ITEMS_PER_PAGE;
 
   useEffect(() => {
     if (!searchParams.get('page')) {
-      router.replace('/habits?page=1');
+      router.replace(`${ROUTES.HABITS}?page=${DEFAULT_PAGE}`);
     }
   }, [searchParams, router]);
 
@@ -74,7 +76,7 @@ const Page = () => {
           sx={{ borderRadius: 10, gap: 0.5, fontWeight: 600 }}
           variant="contained"
           color="primary"
-          onClick={() => router.push('/habits/new')}
+          onClick={() => router.push(ROUTES.NEW_HABIT)}
         >
           <PlusIcon /> Create Habit
         </Button>

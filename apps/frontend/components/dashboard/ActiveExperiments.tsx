@@ -1,11 +1,12 @@
 'use client';
 
-import { IExperiment } from '@/types/experiments';
+import { Experiment } from '@/types/experiments';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import { FlaskConical, Timer, ChevronRight, Activity } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 import Link from 'next/link';
 
-const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
+const ActiveExperiments = ({ experiments }: { experiments: Experiment[] }) => {
   if (!experiments || experiments.length === 0) {
     return (
       <Card className="shadow-xs border border-neutral-200">
@@ -14,7 +15,7 @@ const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
           <Typography variant="h6" className="text-gray-400 font-medium">
             No active experiments
           </Typography>
-          <Link href="/experiments" className="link mt-2">
+          <Link href={ROUTES.EXPERIMENTS} className="link mt-2">
             Start your first test
           </Link>
         </CardContent>
@@ -31,7 +32,7 @@ const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
             Latest Experiments
           </Typography>
         </div>
-        <Link href="/experiments" className="link text-xs flex items-center gap-1 group">
+        <Link href={ROUTES.EXPERIMENTS} className="link text-xs flex items-center gap-1 group">
           View All{' '}
           <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
         </Link>
@@ -52,8 +53,8 @@ const ActiveExperiments = ({ experiments }: { experiments: IExperiment[] }) => {
                     {experiment.successRate !== undefined && (
                       <div
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${experiment.successRate > 70
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-orange-100 text-orange-700'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-orange-100 text-orange-700'
                           }`}
                       >
                         {experiment.successRate}% SUCCESS

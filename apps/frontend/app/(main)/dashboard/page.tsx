@@ -11,6 +11,7 @@ import DailyInspiration from '@/components/dashboard/DailyInspiration';
 import ActiveExperiments from '@/components/dashboard/ActiveExperiments';
 import experimentsService from '@/services/ExperimentsService';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import { getHabitDetailsRoute } from '@/constants/routes';
 
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);

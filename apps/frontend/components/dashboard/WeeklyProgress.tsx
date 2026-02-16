@@ -11,11 +11,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { IWeekStats } from '@/types/habits';
+import { WeekStats } from '@/types/habits';
 import { useHabitChartData } from '@/hooks/useHabitChartData';
 
 interface WeeklyProgressProps {
-  data: IWeekStats;
+  data: WeekStats;
 }
 
 const WeeklyProgress = ({ data }: WeeklyProgressProps) => {
