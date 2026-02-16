@@ -23,12 +23,9 @@ export class HabitsService {
     private readonly habitLogsService: HabitLogsService,
     private readonly analysisService: AnalysisService,
     private readonly streakService: StreakService,
-  ) { }
+  ) {}
 
-  async create(
-    userId: string,
-    dto: CreateHabitDto,
-  ): Promise<ReturnDataType<Habit>> {
+  async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
     const habit = this.habitRepository.create({
       ...dto,
       userId: userId,
@@ -62,10 +59,7 @@ export class HabitsService {
     return { data: { habits: returnData, total } };
   }
 
-  async findHabitById(
-    userId: string,
-    id: string,
-  ): Promise<ReturnDataType<Habit>> {
+  async findHabitById(userId: string, id: string): Promise<ReturnDataType<Habit>> {
     const habit = await this.getHabitOrThrow(id, userId);
     return { data: habit };
   }
@@ -85,10 +79,7 @@ export class HabitsService {
     return { data };
   }
 
-  async getWeeklyStats(
-    userId: string,
-    analytics: boolean,
-  ): Promise<ReturnDataType<IWeekStats>> {
+  async getWeeklyStats(userId: string, analytics: boolean): Promise<ReturnDataType<IWeekStats>> {
     const stats = await this.analysisService.getWeeklyStats(userId, analytics);
 
     return { data: stats };

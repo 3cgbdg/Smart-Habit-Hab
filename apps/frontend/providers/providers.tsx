@@ -35,7 +35,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   );
 
   const [persister] = useState(() =>
-    typeof window !== "undefined"
+    typeof window !== 'undefined'
       ? createSyncStoragePersister({ storage: window.localStorage })
       : null,
   );

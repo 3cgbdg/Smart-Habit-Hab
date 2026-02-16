@@ -63,7 +63,7 @@ const Page = () => {
 
   const totalPages = useMemo(
     () => (habitsData ? Math.ceil(habitsData.total / itemsPerPage) : 0),
-    [habitsData],
+    [habitsData, itemsPerPage],
   );
 
   if (!isHydrated) return null;

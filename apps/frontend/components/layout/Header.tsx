@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Goal, User } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import authService from '@/services/AuthService';
@@ -104,15 +105,13 @@ export default function Header() {
             }}
           >
             {user?.imageUrl ? (
-              <img
+              <Image
                 src={user.imageUrl}
                 alt="User"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).onerror = null;
-                  (e.target as HTMLImageElement).src =
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.firstName || user.email)}&background=random`;
-                }}
-                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                width={40}
+                height={40}
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                unoptimized
               />
             ) : (
               <User size={20} />

@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  Box,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import { X } from 'lucide-react';
 import ExperimentForm from '@/components/experiments/ExperimentForm';
 import { Suspense } from 'react';

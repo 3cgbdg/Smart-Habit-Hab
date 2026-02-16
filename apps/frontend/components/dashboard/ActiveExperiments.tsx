@@ -52,10 +52,11 @@ const ActiveExperiments = ({ experiments }: { experiments: Experiment[] }) => {
                     </Typography>
                     {experiment.successRate !== undefined && (
                       <div
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${experiment.successRate > 70
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-orange-100 text-orange-700'
-                          }`}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          experiment.successRate > 70
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-orange-100 text-orange-700'
+                        }`}
                       >
                         {experiment.successRate}% SUCCESS
                       </div>

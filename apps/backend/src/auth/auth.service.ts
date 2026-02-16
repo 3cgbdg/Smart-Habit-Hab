@@ -18,11 +18,9 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
-  async signup(
-    dto: GeneralAuthDto,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  async signup(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const userId = await this.usersService.createAndReturnUserId(dto.email, hashedPassword);
@@ -34,12 +32,8 @@ export class AuthService {
 
   async login(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.usersService.findByEmailWithPassword(dto.email);
-    const isPasswordValid = await bcrypt.compare(
-      dto.password,
-      user.password ?? '',
-    );
-    if (!isPasswordValid)
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password ?? '');
+    if (!isPasswordValid) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     const access_token = await this.createTokenForAccess(user.id);
     const refresh_token = await this.createTokenForRefresh(user.id);
     return { access_token, refresh_token };
@@ -101,7 +95,7 @@ export class AuthService {
       if (!payload) {
         throw new HttpException('Invalid Google token', HttpStatus.UNAUTHORIZED);
       }
-      return payload as Record<string, any>;
+      return payload as unknown as Record<string, unknown>;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.error('Google token verification failed:', error);

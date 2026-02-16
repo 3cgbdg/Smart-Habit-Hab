@@ -20,6 +20,7 @@ import { Habit } from '@/types/habits';
 import { toast } from 'react-toastify';
 import { experimentSchema, ExperimentFormData } from '@/validation/ExperimentFormSchema';
 import { ExperimentFormProps, Experiment } from '@/types/experiments';
+import { CreateExperimentInput } from '@smart-habit/shared';
 import { AxiosError } from 'axios';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
@@ -58,7 +59,7 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: ExperimentFormProps) =
       startDate: data?.startDate || new Date().toISOString().split('T')[0],
       endDate: data?.endDate || '',
     }),
-    []
+    [],
   );
 
   const {
@@ -80,11 +81,11 @@ const ExperimentForm = ({ mode, initialData, onSuccess }: ExperimentFormProps) =
 
   const mutation = useMutation({
     mutationFn: async (data: ExperimentFormData) => {
-      const payload = { ...data, endDate: data.endDate || null };
+      const payload = { ...data, endDate: data.endDate || null } as CreateExperimentInput;
       if (mode === 'create') {
-        return experimentsService.createExperiment(payload as any);
+        return experimentsService.createExperiment(payload);
       } else {
-        return experimentsService.updateExperiment(initialData!.id, payload as any);
+        return experimentsService.updateExperiment(initialData!.id, payload);
       }
     },
     onSuccess: (res) => {
