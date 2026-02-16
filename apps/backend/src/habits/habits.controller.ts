@@ -3,7 +3,7 @@ import { HabitsService } from './habits.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { ReturnDataType } from 'src/types/common';
-import { Habit } from './entities/habit.entity';
+import { GetHabitResponseDto } from './dto/get-habit-response.dto';
 import type { AuthRequest } from 'src/types/auth';
 import { IWeekStats } from 'src/types/habits';
 
@@ -16,7 +16,7 @@ export class HabitsController {
   async create(
     @Req() req: AuthRequest,
     @Body() dto: CreateHabitDto,
-  ): Promise<ReturnDataType<Habit>> {
+  ): Promise<ReturnDataType<GetHabitResponseDto>> {
     return this.habitsService.create(req.user.id, dto);
   }
 
@@ -27,12 +27,14 @@ export class HabitsController {
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('sortBy') sortBy: string,
     @Query('order') order: 'ASC' | 'DESC' | undefined = 'ASC',
-  ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
+  ): Promise<ReturnDataType<{ habits: GetHabitResponseDto[]; total: number }>> {
     return this.habitsService.findMyHabits(req.user.id, page, itemsPerPage, sortBy, order);
   }
 
   @Get('relevant')
-  async findRelevantHabits(@Req() req: AuthRequest): Promise<ReturnDataType<Habit[]>> {
+  async findRelevantHabits(
+    @Req() req: AuthRequest,
+  ): Promise<ReturnDataType<GetHabitResponseDto[]>> {
     return this.habitsService.findRelevantHabits(req.user.id);
   }
 
@@ -48,7 +50,7 @@ export class HabitsController {
   async findHabitById(
     @Req() req: AuthRequest,
     @Param('id') id: string,
-  ): Promise<ReturnDataType<Habit>> {
+  ): Promise<ReturnDataType<GetHabitResponseDto>> {
     return this.habitsService.findHabitById(req.user.id, id);
   }
 
@@ -67,7 +69,7 @@ export class HabitsController {
     @Req() req: AuthRequest,
     @Param('id') id: string,
     @Body() dto: CreateHabitDto,
-  ): Promise<ReturnDataType<Habit>> {
+  ): Promise<ReturnDataType<GetHabitResponseDto>> {
     return this.habitsService.updateHabit(req.user.id, id, dto);
   }
 }
