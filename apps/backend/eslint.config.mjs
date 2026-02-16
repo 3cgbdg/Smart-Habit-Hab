@@ -9,9 +9,10 @@ export default tseslint.config(
     ignores: ['eslint.config.mjs'],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommendedTypeChecked.map(c => ({ ...c, files: ['src/**/*.ts'] })),
   eslintPluginPrettierRecommended,
   {
+    files: ['src/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -25,6 +26,7 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',

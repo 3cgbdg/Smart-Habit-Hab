@@ -14,7 +14,7 @@ import { ExperimentsService } from './experiments.service';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import type { AuthRequest } from 'src/types/auth';
-import { Experiment } from './entities/experiments.entity';
+import { GetExperimentResponseDto } from './dto/get-experiment-response.dto';
 import { ReturnDataType, IReturnMessage } from 'src/types/common';
 
 @Controller('experiments')
@@ -36,23 +36,22 @@ export class ExperimentsController {
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('analytics') analytics: boolean,
-  ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
+  ): Promise<ReturnDataType<{ data: GetExperimentResponseDto[]; total: number }>> {
     return this.experimentsService.findMyExperiments(req.user.id, page, itemsPerPage, analytics);
   }
 
   @Get('latest')
   async findLatestExperiments(
     @Req() req: AuthRequest,
-    @Query('limit') limit: number,
-  ): Promise<ReturnDataType<(Experiment & { duration: number })[]>> {
-    return this.experimentsService.findLatestExperiments(req.user.id, limit);
+  ): Promise<ReturnDataType<GetExperimentResponseDto[]>> {
+    return this.experimentsService.findLatestExperiments(req.user.id);
   }
 
   @Get(':id')
   async findOne(
     @Req() req: AuthRequest,
     @Param('id') id: string,
-  ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
+  ): Promise<ReturnDataType<GetExperimentResponseDto>> {
     return this.experimentsService.findOne(req.user.id, id);
   }
 

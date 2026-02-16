@@ -8,7 +8,7 @@ import { EXPERIMENT_CONSTANTS } from '../constants/experiments';
 
 import { AnalysisService } from 'src/analysis/analysis.service';
 import { DateUtils } from 'src/utils/date.util';
-import { AnalyticsUtils } from 'src/utils/analytics.util';
+import { GetExperimentResponseDto } from './dto/get-experiment-response.dto';
 
 @Injectable()
 export class ExperimentsService {
@@ -32,7 +32,7 @@ export class ExperimentsService {
     page: number,
     itemsPerPage: number,
     analytics: boolean,
-  ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
+  ): Promise<ReturnDataType<{ data: GetExperimentResponseDto[]; total: number }>> {
     const limit = this.getLimit(itemsPerPage, analytics);
     const [experiments, total] = await this.experimentRepository.findAndCount({
       where: { userId: userId },
@@ -57,18 +57,12 @@ export class ExperimentsService {
       return {
         ...exp,
         successRate,
-        ...(analytics && {
-          consistencyBoost: AnalyticsUtils.calculatePlaceholderConsistencyBoost(),
-        }),
-      };
+      } as GetExperimentResponseDto;
     });
     return { data: { data: dataWithSuccessRate, total } };
   }
 
-  async findLatestExperiments(
-    userId: string,
-    limit: number,
-  ): Promise<ReturnDataType<(Experiment & { duration: number })[]>> {
+  async findLatestExperiments(userId: string): Promise<ReturnDataType<GetExperimentResponseDto[]>> {
     const experiments = await this.experimentRepository
       .createQueryBuilder('experiment')
       .select([
@@ -77,17 +71,12 @@ export class ExperimentsService {
         `ABS(DATE_PART('day', "experiment"."startDate"::timestamp - CURRENT_DATE::timestamp)) AS duration`,
       ])
       .where('experiment.userId = :userId', { userId })
-      .orderBy('experiment.createdAt', 'DESC')
-      .take(limit)
       .getRawMany<{ id: string; name: string; duration: number }>();
 
-    return { data: experiments as (Experiment & { duration: number })[] };
+    return { data: experiments as unknown as GetExperimentResponseDto[] };
   }
 
-  async findOne(
-    userId: string,
-    id: string,
-  ): Promise<ReturnDataType<Experiment & { successRate: number }>> {
+  async findOne(userId: string, id: string): Promise<ReturnDataType<GetExperimentResponseDto>> {
     const experiment = await this.experimentRepository
       .createQueryBuilder('experiment')
       .innerJoinAndSelect('experiment.habit', 'habit')
@@ -121,7 +110,7 @@ export class ExperimentsService {
       data: {
         ...experiment,
         successRate,
-      } as Experiment & { successRate: number },
+      } as GetExperimentResponseDto,
     };
   }
 

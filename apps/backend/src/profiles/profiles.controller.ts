@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import type { AuthRequest } from 'src/types/auth';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { IReturnMessage } from 'src/types/common';
-import { ReturnOwnProfile } from 'src/types/profiles';
+import { GetProfileResponseDto } from './dto/get-profile-response.dto';
 
 @Controller('profiles')
 @UseGuards(AuthGuard('jwt'))
@@ -12,8 +12,9 @@ export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
   @Get('me')
-  async profile(@Req() request: AuthRequest): Promise<ReturnOwnProfile | null> {
-    return this.profilesService.getOwnProfile(request.user.id);
+  async profile(@Req() request: AuthRequest): Promise<GetProfileResponseDto | null> {
+    const profile = await this.profilesService.getOwnProfile(request.user.id);
+    return profile as GetProfileResponseDto | null;
   }
 
   @Patch('update')

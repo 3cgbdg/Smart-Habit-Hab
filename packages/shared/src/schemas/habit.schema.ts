@@ -7,3 +7,13 @@ export const CreateHabitSchema = z.object({
 });
 
 export type CreateHabitInput = z.infer<typeof CreateHabitSchema>;
+
+export const GetHabitSchema = CreateHabitSchema.extend({
+  id: z.string().uuid(),
+  streak: z.number(),
+  completionRate: z.number().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type GetHabitResponse = z.infer<typeof GetHabitSchema>;

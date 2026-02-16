@@ -1,3 +1,1 @@
-npx turbo format
-npx turbo run lint --filter=backend -- --fix
-npx turbo run lint --filter=frontend
+npx lint-staged

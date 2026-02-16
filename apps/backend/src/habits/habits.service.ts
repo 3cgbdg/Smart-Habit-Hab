@@ -14,6 +14,7 @@ import { BatchUtils } from 'src/utils/batch.util';
 import { PaginationUtils } from 'src/utils/pagination.util';
 import { StreakService } from './streak.service';
 import { HABIT_SELECT_FIELDS, HABIT_RELEVANT_SELECT_FIELDS } from './habits.constants';
+import { GetHabitResponseDto } from './dto/get-habit-response.dto';
 
 @Injectable()
 export class HabitsService {
@@ -25,12 +26,13 @@ export class HabitsService {
     private readonly streakService: StreakService,
   ) {}
 
-  async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
+  async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<GetHabitResponseDto>> {
     const habit = this.habitRepository.create({
       ...dto,
       userId: userId,
     });
-    return { data: await this.habitRepository.save(habit) };
+    const savedHabit = await this.habitRepository.save(habit);
+    return { data: savedHabit as GetHabitResponseDto };
   }
 
   async findMyHabits(
@@ -39,7 +41,7 @@ export class HabitsService {
     itemsPerPage: number,
     sortBy: string = 'createdAt',
     order: 'ASC' | 'DESC' | undefined = 'DESC',
-  ): Promise<ReturnDataType<{ habits: Habit[]; total: number }>> {
+  ): Promise<ReturnDataType<{ habits: GetHabitResponseDto[]; total: number }>> {
     const qb = this.habitRepository
       .createQueryBuilder('habit')
       .where('habit.userId = :userId', { userId })
@@ -51,20 +53,19 @@ export class HabitsService {
     const habitIds = habits.map((h) => h.id);
 
     const stats = await this.analysisService.getMonthlyStats(habitIds);
-    const returnData = habits.map((h) => ({
-      ...h,
-      completionRate: stats[h.id],
-    }));
+    const returnData = habits.map(
+      (h) => ({ ...h, completionRate: stats[h.id] }) as GetHabitResponseDto,
+    );
 
     return { data: { habits: returnData, total } };
   }
 
-  async findHabitById(userId: string, id: string): Promise<ReturnDataType<Habit>> {
+  async findHabitById(userId: string, id: string): Promise<ReturnDataType<GetHabitResponseDto>> {
     const habit = await this.getHabitOrThrow(id, userId);
-    return { data: habit };
+    return { data: habit as GetHabitResponseDto };
   }
 
-  async findRelevantHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
+  async findRelevantHabits(userId: string): Promise<ReturnDataType<GetHabitResponseDto[]>> {
     const data = await this.habitRepository
       .createQueryBuilder('habit')
       .leftJoin('habit.logs', 'log')
@@ -76,7 +77,7 @@ export class HabitsService {
       })
       .getMany();
 
-    return { data };
+    return { data: data as GetHabitResponseDto[] };
   }
 
   async getWeeklyStats(userId: string, analytics: boolean): Promise<ReturnDataType<IWeekStats>> {
@@ -105,12 +106,13 @@ export class HabitsService {
     userId: string,
     id: string,
     dto: CreateHabitDto,
-  ): Promise<ReturnDataType<Habit>> {
+  ): Promise<ReturnDataType<GetHabitResponseDto>> {
     const habit = await this.getHabitOrThrow(id, userId);
 
     Object.assign(habit, dto);
+    const savedHabit = await this.habitRepository.save(habit);
 
-    return { data: await this.habitRepository.save(habit) };
+    return { data: savedHabit as GetHabitResponseDto };
   }
 
   async createDailyLogs() {

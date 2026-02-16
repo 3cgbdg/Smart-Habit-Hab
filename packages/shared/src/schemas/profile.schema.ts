@@ -24,3 +24,12 @@ export const UpdateProfileSchema = z
   });
 
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
+
+export const GetProfileSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  darkMode: z.boolean(),
+  emailNotifications: z.boolean(),
+});
+
+export type GetProfileResponse = z.infer<typeof GetProfileSchema>;
