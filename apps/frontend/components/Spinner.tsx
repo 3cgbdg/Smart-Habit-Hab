@@ -13,15 +13,15 @@ const Spinner = ({
         height: size,
         width: size,
         color:
-          color == 'black'
+          color === 'black'
             ? '#000'
-            : color == 'violet'
+            : color === 'violet'
               ? '#9077f3ff'
-              : color == 'blue'
+              : color === 'blue'
                 ? '#3a7ae9ff'
                 : '#fff',
       }}
-      className="animate-spin rounded-full border-t-4  border-solid mx-auto"
+      className="animate-spin rounded-full border-t-4 border-solid mx-auto"
     ></div>
   );
 };

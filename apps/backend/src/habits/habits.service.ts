@@ -25,7 +25,6 @@ export class HabitsService {
     private readonly streakService: StreakService,
   ) {}
 
-  // creating habit
   async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<Habit>> {
     const habit = this.habitRepository.create({
       ...dto,
@@ -34,7 +33,6 @@ export class HabitsService {
     return { data: await this.habitRepository.save(habit) };
   }
 
-  // getting habits of user with completion rate
   async findMyHabits(
     userId: string,
     page: number,
@@ -61,13 +59,11 @@ export class HabitsService {
     return { data: { habits: returnData, total } };
   }
 
-  // getting havit by id
   async findHabitById(userId: string, id: string): Promise<ReturnDataType<Habit>> {
     const habit = await this.getHabitOrThrow(id, userId);
     return { data: habit };
   }
 
-  // find habits that are relevant to user for the day
   async findRelevantHabits(userId: string): Promise<ReturnDataType<Habit[]>> {
     const data = await this.habitRepository
       .createQueryBuilder('habit')
@@ -83,7 +79,6 @@ export class HabitsService {
     return { data };
   }
 
-  // weekly stats for all habits of user
   async getWeeklyStats(userId: string, analytics: boolean): Promise<ReturnDataType<IWeekStats>> {
     const stats = await this.analysisService.getWeeklyStats(userId, analytics);
 
@@ -91,16 +86,16 @@ export class HabitsService {
   }
 
   async completeHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isGood = await this.habitLogsService.completeLog(habitId);
-    if (isGood) {
+    const isSuccess = await this.habitLogsService.completeLog(habitId);
+    if (isSuccess) {
       await this.streakService.incrementStreak(habitId);
     }
     return { data: null };
   }
 
   async skipHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isGood = await this.habitLogsService.skipLog(habitId);
-    if (isGood) {
+    const isSuccess = await this.habitLogsService.skipLog(habitId);
+    if (isSuccess) {
       await this.streakService.resetStreak(habitId);
     }
     return { data: null };
@@ -118,7 +113,6 @@ export class HabitsService {
     return { data: await this.habitRepository.save(habit) };
   }
 
-  // CRON for creating  logs
   async createDailyLogs() {
     const today = DateUtils.getTodayDateString();
 

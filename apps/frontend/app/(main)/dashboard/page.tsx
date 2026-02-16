@@ -86,30 +86,29 @@ const Page = () => {
     staleTime: 60 * 1000,
     gcTime: 1000 * 60 * 60 * 24,
   });
-  /////
 
   ///// handling errors
   useEffect(() => {
     if (isHabitsError && habitsError) {
-      toast.error(habitsError.message);
+      toast.error(habitsError.message || 'Error fetching habits');
     }
   }, [isHabitsError, habitsError]);
 
   useEffect(() => {
     if (isWeeklyStatsError && weeklyStatsError) {
-      toast.error(weeklyStatsError.message);
+      toast.error(weeklyStatsError.message || 'Error fetching weekly stats');
     }
   }, [isWeeklyStatsError, weeklyStatsError]);
 
   useEffect(() => {
     if (isQuoteError && quoteError) {
-      toast.error(quoteError.message);
+      toast.error(quoteError.message || 'Error fetching quote');
     }
   }, [isQuoteError, quoteError]);
 
   useEffect(() => {
     if (isExperimentsError && experimentsError) {
-      toast.error(experimentsError.message);
+      toast.error(experimentsError.message || 'Error fetching experiments');
     }
   }, [isExperimentsError, experimentsError]);
   /////

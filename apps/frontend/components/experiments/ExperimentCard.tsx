@@ -1,13 +1,13 @@
 'use client';
 
 import { Box, Typography, useTheme } from '@mui/material';
-import type { IExperiment } from '@/types/experiments';
+import type { Experiment } from '@/types/experiments';
 import { TrendingUp, Circle } from 'lucide-react';
 import { ExperimentUtils } from '@/utils/experiment';
 import { useRouter } from 'next/navigation';
 
 interface ExperimentCardProps {
-  experiment: IExperiment;
+  experiment: Experiment;
 }
 
 const ExperimentCard = ({ experiment }: ExperimentCardProps) => {

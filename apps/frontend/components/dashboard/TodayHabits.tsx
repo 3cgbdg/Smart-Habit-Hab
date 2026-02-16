@@ -2,12 +2,13 @@
 
 import { Typography, Box, Card } from '@mui/material';
 import HabitCard from './HabitCard';
-import { IHabit } from '@/types/habits';
+import { Habit } from '@/types/habits';
 import { CalendarDays, Plus } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 import Link from 'next/link';
 
 interface TodayHabitsProps {
-  habits: IHabit[];
+  habits: Habit[];
 }
 
 const TodayHabits = ({ habits }: TodayHabitsProps) => {
@@ -21,7 +22,7 @@ const TodayHabits = ({ habits }: TodayHabitsProps) => {
               Today&apos;s Habits
             </Typography>
           </div>
-          <Link href="/habits" className="link text-xs flex items-center gap-1 group">
+          <Link href={ROUTES.HABITS} className="link text-xs flex items-center gap-1 group">
             Manage <Plus className="w-3 h-3" />
           </Link>
         </Box>

@@ -1,4 +1,4 @@
-export interface IHabit {
+export interface Habit {
   id: string;
   name: string;
   description?: string;
@@ -9,28 +9,28 @@ export interface IHabit {
   isActive?: boolean;
 }
 
-export interface IDayStats {
+export interface DayStats {
   date: string;
   count: number;
 }
 
-export interface IWeekStats {
-  completed: IDayStats[];
-  missed?: IDayStats[];
+export interface WeekStats {
+  completed: DayStats[];
+  missed?: DayStats[];
 }
 
-interface IHabitFormProps {
+interface HabitFormProps {
   mode: 'create' | 'update';
-  initialData?: IHabit;
+  initialData?: Habit;
 }
 
-interface IHabitMonthlyRawStats {
+interface HabitMonthlyRawStats {
   habitId: string;
   total: string;
   completed: string;
 }
 
-interface IWeeklyRawStats {
+interface WeeklyRawStats {
   date: Date;
   completedCount: string;
   missedCount?: string;

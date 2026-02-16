@@ -33,13 +33,7 @@ export class ExperimentsService {
     itemsPerPage: number,
     analytics: boolean,
   ): Promise<ReturnDataType<{ data: Experiment[]; total: number }>> {
-    const limit = !analytics
-      ? EXPERIMENT_CONSTANTS.MAX_LIMIT < itemsPerPage
-        ? EXPERIMENT_CONSTANTS.MAX_LIMIT
-        : itemsPerPage
-      : EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT < itemsPerPage
-        ? EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT
-        : itemsPerPage;
+    const limit = this.getLimit(itemsPerPage, analytics);
     const [experiments, total] = await this.experimentRepository.findAndCount({
       where: { userId: userId },
       relations: ['habit'],
@@ -138,7 +132,6 @@ export class ExperimentsService {
 
     if (!experiment) throw new NotFoundException('Experiment not found');
 
-    // combining our experminent with dto data we want to update
     Object.assign(experiment, dto);
     await this.experimentRepository.save(experiment);
     return { message: 'Successfully updated experiment' };
@@ -153,5 +146,12 @@ export class ExperimentsService {
 
     await this.experimentRepository.remove(experiment);
     return { message: 'Successfully deleted experiment' };
+  }
+
+  private getLimit(itemsPerPage: number, analytics: boolean): number {
+    const maxLimit = analytics
+      ? EXPERIMENT_CONSTANTS.MAX_ANALYTICS_LIMIT
+      : EXPERIMENT_CONSTANTS.MAX_LIMIT;
+    return Math.min(itemsPerPage, maxLimit);
   }
 }

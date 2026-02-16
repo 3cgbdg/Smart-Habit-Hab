@@ -2,15 +2,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 import habitsService from '@/services/HabitsService';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import { toast } from 'react-toastify';
 import HabitCard from '@/components/dashboard/HabitCard';
 import { Button, Pagination, Box, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/reduxHooks';
-
-import { Suspense } from 'react';
+import { ROUTES } from '@/constants/routes';
+import { ITEMS_PER_PAGE, DEFAULT_PAGE } from '@/constants/pagination';
 
 const Page = () => {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -27,14 +27,15 @@ const Page = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
-  const itemsPerPage = 10;
+  const page = Number(searchParams.get('page')) || DEFAULT_PAGE;
+  const itemsPerPage = ITEMS_PER_PAGE;
 
   useEffect(() => {
     if (!searchParams.get('page')) {
-      router.replace('/habits?page=1');
+      router.replace(`${ROUTES.HABITS}?page=${DEFAULT_PAGE}`);
     }
   }, [searchParams, router]);
+
   const {
     data: habitsData,
     isError: isHabitsError,
@@ -52,7 +53,7 @@ const Page = () => {
 
   useEffect(() => {
     if (isHabitsError && habitsError) {
-      toast.error(habitsError.message);
+      toast.error(habitsError.message || 'Error fetching habits');
     }
   }, [isHabitsError, habitsError]);
 
@@ -62,19 +63,20 @@ const Page = () => {
 
   const totalPages = useMemo(
     () => (habitsData ? Math.ceil(habitsData.total / itemsPerPage) : 0),
-    [habitsData],
+    [habitsData, itemsPerPage],
   );
+
   if (!isHydrated) return null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex  gap-6 justify-between items-center">
+      <div className="flex gap-6 justify-between items-center">
         <h1 className="page-title">All Habits</h1>
         <Button
           sx={{ borderRadius: 10, gap: 0.5, fontWeight: 600 }}
           variant="contained"
           color="primary"
-          onClick={() => router.push('/habits/new')}
+          onClick={() => router.push(ROUTES.NEW_HABIT)}
         >
           <PlusIcon /> Create Habit
         </Button>
@@ -96,16 +98,13 @@ const Page = () => {
           </Typography>
         </Box>
       ) : (
-        <>
-          {' '}
-          <div className="grid grid-cols-3 gap-4">
-            {habitsData?.habits?.map((h) => (
-              <div key={h.id} className="">
-                <HabitCard type="all" habit={h} />
-              </div>
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-3 gap-4">
+          {habitsData?.habits?.map((h) => (
+            <div key={h.id} className="">
+              <HabitCard type="all" habit={h} />
+            </div>
+          ))}
+        </div>
       )}
 
       {habitsData && habitsData.total > itemsPerPage && (

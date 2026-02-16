@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { IWeekStats, IDayStats } from '@/types/habits';
+import { WeekStats, DayStats } from '@/types/habits';
 
 // returns data in format { day: string, completed: number, missed: number, fullDate: string, count: number }
-export const useHabitChartData = (data: IWeekStats | undefined) => {
+export const useHabitChartData = (data: WeekStats | undefined) => {
   return useMemo(() => {
     if (!data || !data.completed) return [];
 
-    return data.completed.map((item: IDayStats, index: number) => {
+    return data.completed.map((item: DayStats, index: number) => {
       const date = new Date(item.date);
       return {
         day: date.toLocaleDateString('en-US', { weekday: 'short' }),

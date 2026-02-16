@@ -1,7 +1,7 @@
 import { ApiResponse } from '@/types/general';
 import { api } from './axiosInstance';
 import { CreateExperimentInput } from '@smart-habit/shared';
-import { IExperiment } from '@/types/experiments';
+import { Experiment } from '@/types/experiments';
 
 class ExperimentsService {
   async createExperiment(data: CreateExperimentInput): Promise<ApiResponse<null>> {
@@ -18,7 +18,7 @@ class ExperimentsService {
     page: number,
     itemsPerPage: number,
     analytics?: boolean,
-  ): Promise<ApiResponse<{ data: IExperiment[]; total: number }>> {
+  ): Promise<ApiResponse<{ data: Experiment[]; total: number }>> {
     const res = await api.get('/experiments', {
       params: {
         page,
@@ -29,7 +29,7 @@ class ExperimentsService {
     return res.data;
   }
 
-  async getExperimentById(id: string): Promise<ApiResponse<IExperiment>> {
+  async getExperimentById(id: string): Promise<ApiResponse<Experiment>> {
     const res = await api.get(`/experiments/${id}`);
     return res.data;
   }
@@ -39,7 +39,7 @@ class ExperimentsService {
     return res.data;
   }
 
-  async getLatestExperiments(): Promise<ApiResponse<IExperiment[]>> {
+  async getLatestExperiments(): Promise<ApiResponse<Experiment[]>> {
     const res = await api.get('/experiments/latest', {
       params: {
         limit: 3,

@@ -3,13 +3,14 @@
 import { Card, CardContent } from '@mui/material';
 import { Button } from '@mui/material';
 import { Check, CircleCheckBig, Flame, Minus } from 'lucide-react';
-import { IHabit } from '@/types/habits';
+import { Habit } from '@/types/habits';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import habitsService from '@/services/HabitsService';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { getHabitDetailsRoute } from '@/constants/routes';
 
-const HabitCard = ({ habit, type }: { habit: IHabit; type: 'relevant' | 'all' }) => {
+const HabitCard = ({ habit, type }: { habit: Habit; type: 'relevant' | 'all' }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const handleCompleteHabit = () => {
@@ -45,7 +46,7 @@ const HabitCard = ({ habit, type }: { habit: IHabit; type: 'relevant' | 'all' })
   });
 
   const handleEditHabit = () => {
-    router.push(`/habits/${habit.id}`);
+    router.push(getHabitDetailsRoute(habit.id));
   };
 
   return (

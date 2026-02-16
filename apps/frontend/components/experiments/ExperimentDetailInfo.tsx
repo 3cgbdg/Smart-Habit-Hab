@@ -1,10 +1,10 @@
 import { Box, Card, Typography, Divider } from '@mui/material';
 import { Target, Beaker, Calendar, Circle } from 'lucide-react';
-import type { IExperiment } from '@/types/experiments';
+import type { Experiment } from '@/types/experiments';
 import { ExperimentUtils } from '@/utils/experiment';
 
 interface ExperimentDetailInfoProps {
-  experiment: IExperiment;
+  experiment: Experiment;
 }
 
 const ExperimentDetailInfo = ({ experiment }: ExperimentDetailInfoProps) => {

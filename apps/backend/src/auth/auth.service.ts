@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { GeneralAuthDto } from './dto/general-auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -26,7 +21,6 @@ export class AuthService {
   ) {}
 
   async signup(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
-    // hashing password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const userId = await this.usersService.createAndReturnUserId(dto.email, hashedPassword);
@@ -38,8 +32,8 @@ export class AuthService {
 
   async login(dto: GeneralAuthDto): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.usersService.findByEmailWithPassword(dto.email);
-    const isGood = await bcrypt.compare(dto.password, user.password ?? '');
-    if (!isGood) throw new InternalServerErrorException();
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password ?? '');
+    if (!isPasswordValid) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     const access_token = await this.createTokenForAccess(user.id);
     const refresh_token = await this.createTokenForRefresh(user.id);
     return { access_token, refresh_token };

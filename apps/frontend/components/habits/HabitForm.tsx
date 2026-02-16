@@ -7,12 +7,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import habitsService from '@/services/HabitsService';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 import { HabitFormData, habitSchema } from '@/validation/HabitFormSchema';
-import { IHabitFormProps } from '@/types/habits';
+import { HabitFormProps } from '@/types/habits';
 import { AxiosError } from 'axios';
 import { useAppSelector } from '@/hooks/reduxHooks';
 
-const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
+const HabitForm = ({ mode, initialData }: HabitFormProps) => {
   const user = useAppSelector((state) => state.profile.user);
   const userId = user?.id;
 
@@ -46,7 +47,7 @@ const HabitForm = ({ mode, initialData }: IHabitFormProps) => {
       if (initialData?.id) {
         queryClient.invalidateQueries({ queryKey: ['habit', initialData.id, userId] });
       }
-      router.push('/habits');
+      router.push(ROUTES.HABITS);
     },
 
     onError: (error: unknown) => {
