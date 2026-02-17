@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
 import { JwtPayload } from 'src/types/auth';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -84,7 +85,6 @@ export class AuthService {
   }
 
   async verifyGoogleToken(token: string): Promise<Record<string, unknown>> {
-    const { OAuth2Client } = await import('google-auth-library');
     const client = new OAuth2Client(this.configService.get<string>('GOOGLE_CLIENT_ID'));
     try {
       const ticket = await client.verifyIdToken({
