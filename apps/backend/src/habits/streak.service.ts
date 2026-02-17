@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 
 @Injectable()
 export class StreakService {
@@ -10,11 +10,13 @@ export class StreakService {
     private readonly habitRepository: Repository<Habit>,
   ) {}
 
-  async incrementStreak(habitId: string): Promise<void> {
-    await this.habitRepository.increment({ id: habitId }, 'streak', 1);
+  async incrementStreak(habitId: string, manager?: EntityManager): Promise<void> {
+    const repository = manager ? manager.getRepository(Habit) : this.habitRepository;
+    await repository.increment({ id: habitId }, 'streak', 1);
   }
 
-  async resetStreak(habitId: string): Promise<void> {
-    await this.habitRepository.update({ id: habitId }, { streak: 0 });
+  async resetStreak(habitId: string, manager?: EntityManager): Promise<void> {
+    const repository = manager ? manager.getRepository(Habit) : this.habitRepository;
+    await repository.update({ id: habitId }, { streak: 0 });
   }
 }
