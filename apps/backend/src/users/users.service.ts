@@ -27,8 +27,6 @@ export class UsersService {
     const lastName = profile.name?.familyName || profile.family_name;
     const imageUrl = profile.photos?.[0]?.value || profile.picture;
 
-    console.log('Google Profile Image URL:', imageUrl);
-
     if (!email) {
       throw new InternalServerErrorException('Google profile must include an email');
     }
