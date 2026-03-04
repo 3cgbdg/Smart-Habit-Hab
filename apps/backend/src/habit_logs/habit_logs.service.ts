@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HabitLog, Status } from './entities/habit_log.enitity';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { OPTIMIZATION_CONSTANTS } from 'src/constants/optimization';
 import { DateUtils } from 'src/utils/date.util';
 import { BatchUtils } from 'src/utils/batch.util';
@@ -29,25 +29,33 @@ export class HabitLogsService {
     return;
   }
 
-  async changeStatus(habitId: string, status: Status) {
+  async changeStatus(habitId: string, status: Status, manager?: EntityManager) {
+    const log = await this.findOrCreateTodayLog(habitId, manager);
+
+    if (log.status === status) return true;
+
+    log.status = status;
+    const repository = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
+    await repository.save(log);
+
+    return true;
+  }
+
+  private async findOrCreateTodayLog(habitId: string, manager?: EntityManager): Promise<HabitLog> {
+    const repository = manager ? manager.getRepository(HabitLog) : this.habitLogRepository;
     const date = DateUtils.getTodayDateString();
-    let log = await this.habitLogRepository.findOne({
+
+    const existing = await repository.findOne({
       where: { habitId, date },
     });
 
-    if (log) {
-      if (log.status === status) return true;
-      log.status = status;
-    } else {
-      log = this.habitLogRepository.create({
-        habitId,
-        date,
-        status,
-      });
-    }
+    if (existing) return existing;
 
-    await this.habitLogRepository.save(log);
-    return true;
+    return repository.create({
+      habitId,
+      date,
+      status: Status.PENDING,
+    });
   }
 
   async ifLogExistsAndReturn(habitId: string, date: string) {
@@ -59,14 +67,14 @@ export class HabitLogsService {
   }
 
   // set status to completed
-  async completeLog(habitId: string) {
-    await this.changeStatus(habitId, Status.COMPLETED);
+  async completeLog(habitId: string, manager?: EntityManager) {
+    await this.changeStatus(habitId, Status.COMPLETED, manager);
     return true;
   }
 
   // skip habit log
-  async skipLog(habitId: string) {
-    await this.changeStatus(habitId, Status.SKIPPED);
+  async skipLog(habitId: string, manager?: EntityManager) {
+    await this.changeStatus(habitId, Status.SKIPPED, manager);
     return true;
   }
 

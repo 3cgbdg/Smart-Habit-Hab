@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository, DataSource } from 'typeorm';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { HabitLogsService } from 'src/habit_logs/habit_logs.service';
 import { ReturnDataType } from 'src/types/common';
@@ -15,6 +15,7 @@ import { PaginationUtils } from 'src/utils/pagination.util';
 import { StreakService } from './streak.service';
 import { HABIT_SELECT_FIELDS, HABIT_RELEVANT_SELECT_FIELDS } from './habits.constants';
 import { GetHabitResponseDto } from './dto/get-habit-response.dto';
+import { GetHabitSchema } from '@smart-habit/shared';
 
 @Injectable()
 export class HabitsService {
@@ -24,6 +25,7 @@ export class HabitsService {
     private readonly habitLogsService: HabitLogsService,
     private readonly analysisService: AnalysisService,
     private readonly streakService: StreakService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(userId: string, dto: CreateHabitDto): Promise<ReturnDataType<GetHabitResponseDto>> {
@@ -32,7 +34,7 @@ export class HabitsService {
       userId: userId,
     });
     const savedHabit = await this.habitRepository.save(habit);
-    return { data: savedHabit as GetHabitResponseDto };
+    return { data: GetHabitSchema.parse(savedHabit) as GetHabitResponseDto };
   }
 
   async findMyHabits(
@@ -62,7 +64,7 @@ export class HabitsService {
 
   async findHabitById(userId: string, id: string): Promise<ReturnDataType<GetHabitResponseDto>> {
     const habit = await this.getHabitOrThrow(id, userId);
-    return { data: habit as GetHabitResponseDto };
+    return { data: GetHabitSchema.parse(habit) as GetHabitResponseDto };
   }
 
   async findRelevantHabits(userId: string): Promise<ReturnDataType<GetHabitResponseDto[]>> {
@@ -87,18 +89,24 @@ export class HabitsService {
   }
 
   async completeHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isSuccess = await this.habitLogsService.completeLog(habitId);
-    if (isSuccess) {
-      await this.streakService.incrementStreak(habitId);
-    }
+    await this.dataSource.transaction(async (manager) => {
+      const isSuccess = await this.habitLogsService.completeLog(habitId, manager);
+      if (isSuccess) {
+        await this.streakService.incrementStreak(habitId, manager);
+      }
+    });
+
     return { data: null };
   }
 
   async skipHabit(habitId: string): Promise<ReturnDataType<null>> {
-    const isSuccess = await this.habitLogsService.skipLog(habitId);
-    if (isSuccess) {
-      await this.streakService.resetStreak(habitId);
-    }
+    await this.dataSource.transaction(async (manager) => {
+      const isSuccess = await this.habitLogsService.skipLog(habitId, manager);
+      if (isSuccess) {
+        await this.streakService.resetStreak(habitId, manager);
+      }
+    });
+
     return { data: null };
   }
 
@@ -112,7 +120,7 @@ export class HabitsService {
     Object.assign(habit, dto);
     const savedHabit = await this.habitRepository.save(habit);
 
-    return { data: savedHabit as GetHabitResponseDto };
+    return { data: GetHabitSchema.parse(savedHabit) as GetHabitResponseDto };
   }
 
   async createDailyLogs() {
@@ -141,7 +149,12 @@ export class HabitsService {
   }
 
   private async getHabitOrThrow(id: string, userId: string): Promise<Habit> {
-    const habit = await this.habitRepository.findOne({ where: { id, userId } });
+    const habit = await this.habitRepository
+      .createQueryBuilder('habit')
+      .where('habit.id = :id AND habit.userId = :userId', { id, userId })
+      .select(HABIT_SELECT_FIELDS)
+      .getOne();
+
     if (!habit) {
       throw new NotFoundException('Habit not found');
     }
